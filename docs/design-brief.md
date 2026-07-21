@@ -26,21 +26,36 @@ Not "signed up". Not "searched". A real appointment on a real doctor's calendar.
 
 ## Where the incumbents leave room
 
-*Directional observations from using these products, to be pressure-tested — not verified market research.*
+*Based on published user reviews and product documentation, July 2026. Sources at the foot of this page.*
 
 | Product | The gap Curo aims at |
 |---|---|
-| **Practo** | Discovery-heavy. Listings, reviews and ads dominate; actual bookable availability is buried a page deep, and many listings end in a callback rather than a confirmed time. |
-| **Zocdoc** | Strong booking flow, but insurance-first onboarding front-loads a long form before the patient sees a single slot. Time-to-first-slot is the cost. |
-| **Apollo 24\|7** | Bundles pharmacy, labs, and consults into one app. Booking competes for attention with commerce; the appointment is one tile among many. |
+| **Practo** | The confirmation itself is unreliable. Users report appointments that never get confirmed, prerecorded messages redirecting them to the hospital, doctor no-shows, and wrong clinic details on "confirmed" bookings. One reviewer describes the confirmation system as "completely broken". |
+| **Zocdoc** | A strong, well-structured flow, but insurance verification sits between the patient and a slot, and reviewers report **calendar mismatches caused by provider-managed schedules** — the platform shows availability it doesn't actually control. |
+| **Apollo 24\|7** | Booking itself reviews well; the complaints are about the surrounding app — layout clutter, a profile-setup prompt that blocks entry on open, and doctors missing from nearby-specialty search. Discovery is the weak surface, not the booking. |
 
-**The common weakness: none of them shows you availability at the moment of choosing.** You pick a doctor, *then* discover when they're free — and often backtrack. Curo inverts it.
+**The common root cause is sharper than "availability is hidden".** In all three, *the platform is not the source of truth for the doctor's calendar.* The clinic owns the schedule, the platform holds a stale copy, and the two drift. Everything patients complain about — unconfirmed bookings, no-shows, wrong times, calendar mismatches — follows from that single architectural fact.
 
 ## The design bet
 
-Borrow the mechanic that made cinema ticketing obvious: **a seat map**. A doctor's day is a grid of time slots with three unmistakable states — available, filling fast, taken. The patient reads the whole day in one glance and commits with one tap.
+Two moves, and the second is the one that matters.
 
-That grid is the centre of the product. Discovery leads into it, confirmation flows out of it, and the doctor-side dashboard is the same data seen from behind the desk.
+**One: borrow the seat map.** A doctor's day is a grid of time slots with three unmistakable states — available, filling fast, taken. The patient reads the whole day at a glance and commits in one tap. It's the mechanic that made cinema ticketing obvious.
+
+**Two: make the grid the truth, not a picture of it.** Curo computes every slot from the doctor's own availability rules minus their time off minus real bookings, live, on one database. There is no synced copy to drift. A booking is confirmed the instant it's written, because a partial unique index makes a conflicting write impossible.
+
+That is why the incumbents' central failure can't happen here — not because Curo tries harder at confirmation, but because the architecture removes the gap that produces the failure.
+
+---
+
+**Sources**
+
+- [Practo reviews — PissedConsumer](https://practo.pissedconsumer.com/review.html)
+- [Practo reviews — Trustpilot](https://www.trustpilot.com/review/practo.com)
+- [Zocdoc review: provider coverage, filters and user experience](https://leafsnap.com/zocdoc-assessing-provider-coverage-filters-and-user-experience/)
+- [What a high-converting healthcare booking experience looks like — Zocdoc](https://www.zocdoc.com/resources/blog/article/high-converting-healthcare-booking-experience-looks-like)
+- [Apollo 247 — Google Play reviews](https://play.google.com/store/apps/details?id=com.apollo.patientapp&hl=en_IN)
+- [Apollo 247 — App Store reviews](https://apps.apple.com/in/app/apollo-247-health-medicine/id1496740273)
 
 ## Success criteria
 
