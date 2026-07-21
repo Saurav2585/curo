@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ComponentType } from "react";
 import {
   Stethoscope,
   Sparkles,
@@ -14,7 +15,10 @@ import { SiteHeader } from "@/components/site-header";
 import type { Specialty } from "@/lib/types";
 
 /** Seed stores an icon name per specialty; map it to a real component. */
-const ICONS: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
+const ICONS: Record<
+  string,
+  ComponentType<{ size?: number; color?: string; className?: string }>
+> = {
   stethoscope: Stethoscope,
   sparkles: Sparkles,
   "heart-pulse": HeartPulse,

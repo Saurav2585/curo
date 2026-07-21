@@ -16,7 +16,18 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet) {
+        // Explicitly typed: @supabase/ssr declares `cookies` as a union of its
+        // current and deprecated method shapes, so TypeScript can't contextually
+        // infer this parameter and falls back to an implicit any — which passes
+        // `next dev` but fails `next build`.
+        setAll(
+          cookiesToSet: Array<{
+            name: string;
+            value: string;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            options?: any;
+          }>
+        ) {
           // Server components can't set cookies. Middleware refreshes the
           // session instead, so swallowing this is correct, not a workaround.
           try {
