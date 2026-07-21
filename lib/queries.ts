@@ -70,6 +70,13 @@ export async function getDoctors(filters: DoctorFilters) {
     doctors: (data ?? []) as unknown as DoctorRow[],
     error,
     appliedSpecialty: specialtySlug,
+    /**
+     * The term actually used as a name search, or null if the query resolved to
+     * a specialty instead. Callers must not carry `q` forward in filter links
+     * when this is null — "cardio" would then be re-run as a doctor name and
+     * return nothing.
+     */
+    nameQuery: nameSearch,
   };
 }
 

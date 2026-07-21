@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { AlertCircle, SearchX } from "lucide-react";
+import { AlertCircle, SearchX, Search, X } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { DoctorCard } from "@/components/doctor-card";
 import { getDoctors, getNextSlots, getFilterOptions } from "@/lib/queries";
@@ -49,14 +49,21 @@ export default async function DoctorsPage({
   const params = await searchParams;
   const { specialty, city, q } = params;
 
-  const [{ doctors, error, appliedSpecialty }, { specialties, cities }] =
+  const [{ doctors, error, appliedSpecialty, nameQuery }, { specialties, cities }] =
     await Promise.all([getDoctors({ specialty, city, q }), getFilterOptions()]);
 
   const nextSlots = await getNextSlots(doctors.map((d) => d.id));
 
   const buildHref = (patch: Record<string, string | undefined>) => {
     const next = new URLSearchParams();
-    const merged = { specialty: appliedSpecialty ?? undefined, city, ...patch };
+    const merged = {
+      specialty: appliedSpecialty ?? undefined,
+      city,
+      // Only a genuine name search survives a filter change. If the query
+      // resolved to a specialty it is already represented above.
+      q: nameQuery ?? undefined,
+      ...patch,
+    };
     for (const [k, v] of Object.entries(merged)) if (v) next.set(k, v);
     const qs = next.toString();
     return qs ? `/doctors?${qs}` : "/doctors";
@@ -73,6 +80,57 @@ export default async function DoctorsPage({
             : "All doctors"}
           {city ? ` in ${city}` : ""}
         </h1>
+
+        {/* Search by name or specialty. A GET form keeps the query in the URL,
+            so results stay shareable and the back button behaves. */}
+        <form action="/doctors" className="mt-6 flex max-w-xl items-center gap-2">
+          {appliedSpecialty && (
+            <input type="hidden" name="specialty" value={appliedSpecialty} />
+          )}
+          {city && <input type="hidden" name="city" value={city} />}
+
+          <div className="flex flex-1 items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-control)] bg-[var(--bg-surface)] px-3">
+            <label htmlFor="doctor-search" className="sr-only">
+              Search by doctor name or specialty
+            </label>
+            <Search size={17} color="var(--text-muted)" aria-hidden />
+            <input
+              id="doctor-search"
+              name="q"
+              defaultValue={nameQuery ?? ""}
+              placeholder="Search by doctor name or specialty"
+              className="h-11 flex-1 bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-disabled)] focus:outline-none"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="h-11 shrink-0 rounded-[var(--radius-md)] px-5 font-medium"
+            style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
+          >
+            Search
+          </button>
+        </form>
+
+        {nameQuery && (
+          <p className="mt-3 flex items-center gap-2 text-[0.9375rem] text-[var(--text-muted)]">
+            Showing matches for
+            <span className="font-medium text-[var(--text-primary)]">
+              “{nameQuery}”
+            </span>
+            <Link
+              href={buildHref({ q: undefined })}
+              className="inline-flex items-center gap-1 rounded-[var(--radius-full)] px-2 py-0.5 text-[0.8125rem]"
+              style={{
+                background: "var(--bg-sunken)",
+                color: "var(--text-secondary)",
+              }}
+            >
+              <X size={13} aria-hidden />
+              Clear
+            </Link>
+          </p>
+        )}
 
         {/* Filters */}
         <div className="mt-6 space-y-3">
@@ -136,11 +194,19 @@ export default async function DoctorsPage({
                 No doctors match these filters
               </p>
               <p className="mt-1 text-[var(--text-muted)]">
-                {q
-                  ? `Nothing matched “${q}”.`
+                {nameQuery
+                  ? `No doctor's name matches “${nameQuery}”. Try a specialty instead — or check the spelling.`
                   : "Try widening the specialty or city."}
               </p>
               <div className="mt-5 flex justify-center gap-2">
+                {nameQuery && (
+                  <Link
+                    href={buildHref({ q: undefined })}
+                    className="rounded-[var(--radius-md)] border border-[var(--border-control)] px-4 py-2 text-[0.9375rem] text-[var(--text-primary)]"
+                  >
+                    Clear search
+                  </Link>
+                )}
                 {city && (
                   <Link
                     href={buildHref({ city: undefined, q: undefined })}
