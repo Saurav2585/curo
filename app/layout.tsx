@@ -1,0 +1,25 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+export const metadata: Metadata = {
+  title: "Curo — book a doctor in 60 seconds",
+  description:
+    "Find the right doctor and lock a real appointment slot. No callbacks, no hold music.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="en" className={inter.variable}>
+      <body>{children}</body>
+    </html>
+  );
+}
