@@ -114,6 +114,90 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Premium layer — depth, glass, gradient, motion.
+   Utility classes so components stay declarative and the token vars stay the
+   single source of colour. Nothing here changes behaviour.
+--------------------------------------------------------------------------- */
+
+/* Layered ambient elevation — softer and deeper than a single drop shadow. */
+.shadow-ambient {
+  box-shadow:
+    0 1px 2px rgb(14 18 20 / 0.04),
+    0 8px 24px -8px rgb(14 18 20 / 0.10),
+    0 24px 48px -24px rgb(14 18 20 / 0.12);
+}
+
+/* A single glass surface for floating layers (nav on scroll, hero cards). */
+.glass {
+  background: color-mix(in srgb, var(--bg-surface) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+}
+
+/* Restrained brand gradient — used once on the hero, once on accents. */
+.gradient-brand {
+  background-image: linear-gradient(135deg,
+    var(--color-teal-500) 0%,
+    var(--color-teal-400) 55%,
+    var(--color-teal-300) 100%);
+}
+.gradient-text {
+  background-image: linear-gradient(120deg,
+    var(--color-teal-600), var(--color-teal-400));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Hairline ring border — the Linear/Vercel card edge. */
+.ring-hairline {
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+}
+
+/* Scroll-reveal primitive. Elements start slightly down and fade up when a
+   tiny observer (in the page) adds .is-visible. Reduced-motion users get the
+   final state instantly via the media query above. */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* Interactive card lift — one consistent hover for every clickable card. */
+.lift {
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+.lift:hover {
+  transform: translateY(-3px);
+}
+
+/* Slow gradient drift for hero background, calm and premium. */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.float-slow { animation: float-slow 6s ease-in-out infinite; }
+
+/* Marquee for the logo/stack strip. */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 28s linear infinite; }
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
 }`);
 
 mkdirSync(resolve(root, "app"), { recursive: true });
