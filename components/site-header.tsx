@@ -31,6 +31,12 @@ export async function SiteHeader() {
           >
             Find a doctor
           </Link>
+          <Link
+            href="/pricing"
+            className="hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:block"
+          >
+            For clinics
+          </Link>
 
           {user ? (
             <>
