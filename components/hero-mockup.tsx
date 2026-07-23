@@ -1,4 +1,4 @@
-import { Check, ChevronRight } from "lucide-react";
+import { Check } from "lucide-react";
 
 /**
  * A faithful mockup of the real slot grid, built from the same tokens as the
@@ -94,8 +94,8 @@ export function HeroMockup() {
         </div>
       </div>
 
-      {/* Floating "confirmed" card — the payoff */}
-      <div className="glass ring-hairline float-slow absolute -bottom-5 -left-5 flex items-center gap-3 rounded-[var(--radius-lg)] p-3 shadow-ambient">
+      {/* One quiet floating confirmation — the payoff, not a decoration pile. */}
+      <div className="ring-hairline absolute -bottom-4 -left-4 flex items-center gap-3 rounded-[var(--radius-lg)] bg-[var(--bg-surface)] p-3 shadow-ambient">
         <span
           className="flex h-9 w-9 items-center justify-center rounded-full"
           style={{ background: "var(--bg-successSubtle)" }}
@@ -103,18 +103,9 @@ export function HeroMockup() {
           <Check size={18} color="var(--text-success)" aria-hidden />
         </span>
         <div>
-          <p className="text-[0.8125rem] font-semibold text-[var(--text-primary)]">Booked in 48s</p>
+          <p className="text-[0.8125rem] font-semibold text-[var(--text-primary)]">Confirmed in 48s</p>
           <p className="tabular text-[0.6875rem] text-[var(--text-muted)]">Ref CU-27265B</p>
         </div>
-      </div>
-
-      {/* Floating reach card */}
-      <div className="glass ring-hairline absolute -right-4 -top-4 hidden items-center gap-2 rounded-[var(--radius-lg)] p-3 shadow-ambient sm:flex">
-        <div>
-          <p className="tabular text-[1.25rem] font-bold leading-none text-[var(--text-primary)]">75%</p>
-          <p className="text-[0.6875rem] text-[var(--text-muted)]">slots filled today</p>
-        </div>
-        <ChevronRight size={16} color="var(--text-muted)" aria-hidden />
       </div>
     </div>
   );

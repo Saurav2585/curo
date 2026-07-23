@@ -63,6 +63,26 @@ Push to GitHub, import into Vercel, add the two env vars, deploy. **Do this befo
 
 ---
 
+## Demo access (for reviewers)
+
+The app has two sides. You can explore the patient side with no account at all —
+search, compare doctors, and view live availability freely; you only sign in at
+the moment you confirm a booking.
+
+To see both sides:
+
+| Role | How to get in |
+|---|---|
+| **Patient** | Sign up with any email on `/sign-up`, or just browse `/doctors` without an account and book — you'll be asked to sign in only at the final confirm step. |
+| **Doctor portal** | Sign in at `/sign-in` with **`doctor@curo.demo`** / **`CuroDemo123`**, then open `/dashboard`. You'll see Dr. Ananya Sharma's live schedule, today's KPIs, appointments, and consulting hours. |
+
+The doctor and patient views read the **same database** — a booking made as a
+patient appears instantly on the doctor's dashboard, because there is no synced
+copy, only one source of truth.
+
+> Note: email confirmation is disabled on the demo project so accounts are
+> usable immediately.
+
 ## The two decisions that carry the build
 
 **Slots are computed, never stored.** `get_available_slots(doctor_id, date)` derives every slot from availability rules, minus time off, minus booked appointments. There is no slot table, no nightly job, and nothing that can fall out of sync. Change a doctor's hours and the grid is correct on the next query.

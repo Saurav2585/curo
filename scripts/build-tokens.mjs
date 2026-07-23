@@ -101,6 +101,28 @@ body {
 /* Every time, fee and count in the product. Digits must not jitter. */
 .tabular { font-variant-numeric: tabular-nums; font-feature-settings: var(--font-feature-tabular); }
 
+/* ---------------------------------------------------------------------------
+   Type scale — ONE modular scale, used everywhere. Ends the drift of ad-hoc
+   rem sizes. Based on the deck's 12·14·16·20·24·32·48 with tuned leading and
+   tracking for a restrained, Linear/Stripe-grade hierarchy.
+--------------------------------------------------------------------------- */
+.t-eyebrow {
+  font-size: 0.8125rem; font-weight: 600; line-height: 1.2;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-brand);
+}
+.t-display {
+  font-size: clamp(2.25rem, 1.4rem + 3.4vw, 3rem);
+  font-weight: 700; line-height: 1.04; letter-spacing: -0.028em;
+  color: var(--text-primary);
+}
+.t-h1 { font-size: 2rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; color: var(--text-primary); }
+.t-h2 { font-size: 1.5rem; font-weight: 650; line-height: 1.2; letter-spacing: -0.015em; color: var(--text-primary); }
+.t-h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.3; color: var(--text-primary); }
+.t-lead { font-size: 1.125rem; line-height: 1.6; color: var(--text-secondary); }
+.t-body { font-size: 1rem; line-height: 1.6; color: var(--text-secondary); }
+.t-small { font-size: 0.875rem; line-height: 1.5; color: var(--text-muted); }
+.t-micro { font-size: 0.75rem; line-height: 1.4; color: var(--text-muted); }
+
 /* One focus treatment, applied everywhere, never removed. */
 :focus-visible {
   outline: 2px solid var(--border-focus);

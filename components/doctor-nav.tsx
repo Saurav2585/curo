@@ -33,7 +33,7 @@ export function DoctorNav({ doctorName }: { doctorName: string }) {
           <Link
             key={href}
             href={href}
-            className="flex items-center gap-2.5 rounded-[var(--radius-md)] px-3 py-2 text-[0.9375rem] text-[var(--text-secondary)] hover:bg-[var(--bg-sunken)] hover:text-[var(--text-primary)]"
+            className="group flex items-center gap-2.5 rounded-[var(--radius-md)] px-3 py-2 text-[0.9375rem] text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-brandSubtle)] hover:text-[var(--text-brand)]"
           >
             <Icon size={17} aria-hidden />
             {label}

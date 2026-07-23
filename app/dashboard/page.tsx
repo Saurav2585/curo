@@ -21,21 +21,32 @@ function KpiCard({
   sub,
   icon: Icon,
   failed,
+  tone = "brand",
 }: {
   label: string;
   value: string;
   sub?: string;
   icon: ComponentType<{ size?: number; color?: string }>;
   failed?: boolean;
+  tone?: "brand" | "neutral";
 }) {
+  const tint =
+    tone === "brand"
+      ? { bg: "var(--bg-brandSubtle)", fg: "var(--text-brand)" }
+      : { bg: "var(--bg-sunken)", fg: "var(--text-muted)" };
   return (
-    <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+    <div className="ring-hairline lift rounded-[var(--radius-lg)] bg-[var(--bg-surface)] p-5">
       <div className="flex items-center justify-between">
         <span className="text-[0.8125rem] text-[var(--text-muted)]">{label}</span>
-        <Icon size={16} color="var(--text-muted)" />
+        <span
+          className="flex h-8 w-8 items-center justify-center rounded-full"
+          style={{ background: tint.bg }}
+        >
+          <Icon size={16} color={tint.fg} />
+        </span>
       </div>
       {/* Failed load shows an em-dash, never 0 — a false zero reads as real data */}
-      <p className="tabular mt-2 text-[2rem] font-bold leading-none text-[var(--text-primary)]">
+      <p className="tabular mt-3 text-[2rem] font-bold leading-none text-[var(--text-primary)]">
         {failed ? "—" : value}
       </p>
       {sub && <p className="mt-1 text-[0.8125rem] text-[var(--text-muted)]">{sub}</p>}
@@ -104,6 +115,7 @@ export default async function DashboardPage() {
           value={`${stats?.cancelled_today ?? 0}`}
           icon={XCircle}
           failed={failed}
+          tone="neutral"
         />
       </div>
 
@@ -130,7 +142,7 @@ export default async function DashboardPage() {
                     key={a.id}
                     className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]"
                   >
-                    <td className="tabular whitespace-nowrap px-4 py-3 font-medium text-[var(--text-primary)]">
+                    <td className="tabular whitespace-nowrap px-4 py-3 font-semibold text-[var(--text-brand)]">
                       {slotTime(a.starts_at)}
                     </td>
                     <td className="px-4 py-3 text-[var(--text-primary)]">{a.patient_name}</td>

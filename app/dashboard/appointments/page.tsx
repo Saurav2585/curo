@@ -95,7 +95,7 @@ export default async function AppointmentsPage({
               <tbody>
                 {appts.map((a) => (
                   <tr key={a.id} className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                    <td className="tabular whitespace-nowrap px-4 py-3 text-[var(--text-primary)]">
+                    <td className="tabular whitespace-nowrap px-4 py-3 font-medium text-[var(--text-brand)]">
                       {slotFull(a.starts_at)}
                     </td>
                     <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
