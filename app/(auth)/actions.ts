@@ -24,13 +24,17 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export async function signIn(_prev: AuthState, formData: FormData): Promise<AuthState> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const next = safeNext(String(formData.get("next") ?? ""));
+  const rawNext = String(formData.get("next") ?? "");
+  // Distinguish an explicit destination from the default, so we can send users
+  // to the right home for their role when no explicit next was given.
+  const explicitNext =
+    rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : null;
 
   if (!EMAIL_RE.test(email)) return { error: "Enter a valid email address." };
   if (!password) return { error: "Enter your password." };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     if (error.message.toLowerCase().includes("invalid"))
@@ -41,7 +45,16 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   }
 
   revalidatePath("/", "layout");
-  redirect(next);
+
+  if (explicitNext) redirect(explicitNext);
+
+  // No explicit destination → send each role to its own home.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", data.user!.id)
+    .maybeSingle();
+  redirect(profile?.role === "doctor" ? "/dashboard" : "/bookings");
 }
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {

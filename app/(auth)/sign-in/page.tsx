@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CalendarCheck } from "lucide-react";
 import { AuthForm } from "../auth-form";
+import { getSessionRole, roleHome } from "@/lib/roles";
+
+export const dynamic = "force-dynamic";
 
 export default async function SignInPage({
   searchParams,
@@ -8,6 +12,12 @@ export default async function SignInPage({
   searchParams: Promise<{ next?: string }>;
 }) {
   const { next } = await searchParams;
+
+  // Already signed in — no reason to show the login form. Go to a sensible home.
+  const session = await getSessionRole();
+  if (session) {
+    redirect(next && next.startsWith("/") && !next.startsWith("//") ? next : roleHome(session.role));
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">

@@ -22,33 +22,40 @@ export default async function DashboardLayout({
 
   const doctor = await getMyDoctor();
 
-  // Signed in, but not linked to a doctor profile yet. Rather than a bare
-  // "403", explain how to claim one — this is a demo, and the reviewer needs a
-  // way in.
+  // Signed in, but this account isn't a doctor. Show a clean, role-appropriate
+  // access screen — never internal/developer detail. (Linking a demo doctor
+  // account is documented in the project README.)
   if (!doctor) {
     return (
-      <main className="mx-auto max-w-lg px-6 py-24 text-center">
-        <Stethoscope size={32} color="var(--text-brand)" className="mx-auto" aria-hidden />
+      <main className="mx-auto max-w-md px-6 py-24 text-center">
+        <span
+          className="mx-auto flex h-14 w-14 items-center justify-center rounded-full"
+          style={{ background: "var(--bg-brandSubtle)" }}
+        >
+          <Stethoscope size={26} color="var(--text-brand)" aria-hidden />
+        </span>
         <h1 className="mt-4 text-[1.5rem] font-bold text-[var(--text-primary)]">
-          This account isn&apos;t a doctor yet
+          The doctor portal
         </h1>
         <p className="mt-2 text-[var(--text-muted)]">
-          To preview the doctor portal, claim a seeded profile. In the Supabase
-          SQL editor, run:
+          This area is for verified doctors. Your account doesn&apos;t have a
+          doctor profile, so there&apos;s nothing to manage here.
         </p>
-        <pre className="mt-4 overflow-x-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-sunken)] p-3 text-left text-[0.8125rem] text-[var(--text-primary)]">
-          select claim_doctor_profile(&apos;ananya-sharma&apos;);
-        </pre>
-        <p className="mt-3 text-[0.8125rem] text-[var(--text-muted)]">
-          Then reload this page. Use any seeded slug: ananya-sharma, rajesh-iyer,
-          meera-nair…
-        </p>
-        <Link
-          href="/"
-          className="mt-6 inline-block text-[0.9375rem] font-medium text-[var(--text-brand)] hover:underline"
-        >
-          ← Back to Curo
-        </Link>
+        <div className="mt-6 flex justify-center gap-3">
+          <Link
+            href="/doctors"
+            className="inline-flex h-11 items-center rounded-[var(--radius-md)] px-5 font-medium"
+            style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
+          >
+            Find a doctor
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex h-11 items-center rounded-[var(--radius-md)] border border-[var(--border-control)] px-5 font-medium text-[var(--text-primary)] hover:bg-[var(--bg-sunken)]"
+          >
+            Back to Curo
+          </Link>
+        </div>
       </main>
     );
   }

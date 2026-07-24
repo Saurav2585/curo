@@ -15,7 +15,7 @@ export function DoctorNav({ doctorName }: { doctorName: string }) {
   const pathname = usePathname();
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
-      <Link href="/" className="mb-6 flex items-center gap-2 px-2">
+      <Link href="/dashboard" className="mb-6 flex items-center gap-2 px-2">
         <span
           className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]"
           style={{ background: "var(--bg-brand)" }}

@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { CalendarCheck } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getSessionRole } from "@/lib/roles";
 import { signOut } from "@/app/(auth)/actions";
 
 export async function SiteHeader() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await getSessionRole();
+  const isDoctor = session?.role === "doctor";
 
   return (
     <header className="glass sticky top-0 z-40 border-b border-[var(--border-subtle)]">
@@ -38,13 +36,13 @@ export async function SiteHeader() {
             For clinics
           </Link>
 
-          {user ? (
+          {session ? (
             <>
               <Link
-                href="/bookings"
+                href={isDoctor ? "/dashboard" : "/bookings"}
                 className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               >
-                My bookings
+                {isDoctor ? "Dashboard" : "My bookings"}
               </Link>
               <form action={signOut}>
                 <button
