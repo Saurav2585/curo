@@ -72,25 +72,20 @@ test("patient can sign up and reach an empty bookings page", async ({ page }, te
 });
 
 // ---------------------------------------------------------------- provider journey
-test("a new provider applicant is gated out of the dashboard", async ({ page }) => {
+test("a new provider applicant creates a draft and is gated out of the dashboard", async ({ page }) => {
   const email = `provider_${Date.now()}@curo.demo`;
+  // Step 1: create the provider account + draft.
   await page.goto("/apply");
   await page.getByLabel("Full name").fill("Test Provider");
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Phone (optional)").fill("+91 9800000000");
   await page.getByLabel("Password", { exact: true }).fill("Provpass123");
   await page.getByLabel("Confirm password").fill("Provpass123");
-  await page.getByLabel("Clinic / hospital name").fill("Test Clinic");
-  await page.getByLabel("City").fill("Bengaluru");
-  await page.getByLabel("Specialty").fill("Cardiology");
-  await page.getByLabel("Medical registration number").fill("REG123456");
-  await page.getByLabel("Qualifications").fill("MBBS, MD");
-  await page.getByRole("checkbox").check();
-  await page.getByRole("button", { name: "Submit application" }).click();
-  // Lands on the pending status page…
-  await expect(page).toHaveURL(/\/apply\/status/, { timeout: 15_000 });
-  await expect(page.getByText(/under review/i)).toBeVisible();
-  // …and cannot reach the dashboard (no doctor privileges yet).
+  await page.getByRole("button", { name: /create account/i }).click();
+
+  // Step 2: the resumable detail form appears (draft state).
+  await expect(page.getByText("Complete your application")).toBeVisible({ timeout: 15_000 });
+
+  // A draft provider cannot reach the dashboard.
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/apply\/status/);
 });

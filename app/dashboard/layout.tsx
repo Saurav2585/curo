@@ -22,16 +22,18 @@ export default async function DashboardLayout({
 
   const doctor = await getMyDoctor();
 
-  // A provider whose application isn't approved yet belongs on their status
-  // page, not the portal. This is the "no dashboard access until approved" gate.
-  if (!doctor) {
-    const { data: application } = await supabase
-      .from("provider_applications")
-      .select("status")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (application && application.status !== "approved") redirect("/apply/status");
-  }
+  // Dashboard access rules by application status:
+  //   suspended → blocked even though a doctor row exists (dashboard disabled)
+  //   draft / submitted / pending / info_requested / rejected → not yet a doctor
+  //   approved → full access
+  const { data: application } = await supabase
+    .from("provider_applications")
+    .select("status")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (application?.status === "suspended") redirect("/apply/status");
+  if (!doctor && application && application.status !== "approved") redirect("/apply/status");
 
   // Signed in, but this account isn't a doctor. Show a clean, role-appropriate
   // access screen — never internal/developer detail. (Linking a demo doctor

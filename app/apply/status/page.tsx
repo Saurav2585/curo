@@ -10,6 +10,18 @@ const STATUS_UI: Record<
   string,
   { icon: typeof Clock; tint: string; title: string; body: string }
 > = {
+  draft: {
+    icon: Clock,
+    tint: "var(--text-muted)",
+    title: "Application in progress",
+    body: "Your application isn't submitted yet. Pick up where you left off whenever you're ready.",
+  },
+  submitted: {
+    icon: Clock,
+    tint: "var(--text-warn)",
+    title: "Application submitted",
+    body: "Thanks — we've received your application and it's queued for review. We'll verify your credentials and be in touch shortly.",
+  },
   pending: {
     icon: Clock,
     tint: "var(--text-warn)",
@@ -112,6 +124,14 @@ export default async function ApplyStatusPage() {
             style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
           >
             Go to dashboard
+          </Link>
+        ) : app.status === "draft" || app.status === "info_requested" ? (
+          <Link
+            href="/apply"
+            className="mt-6 inline-flex h-11 items-center rounded-[var(--radius-md)] px-6 font-medium"
+            style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
+          >
+            Continue application
           </Link>
         ) : (
           <form action={signOut} className="mt-6">
