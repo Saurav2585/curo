@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "tokens": "node scripts/build-tokens.mjs",
-    "contrast": "python3 scripts/check-contrast.py"
+    "contrast": "python3 scripts/check-contrast.py",
+    "test:e2e": "playwright test",
+    "test:report": "playwright show-report"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
@@ -20,6 +22,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.1",
