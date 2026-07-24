@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Clock, CalendarCheck, CreditCard } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Clock, CalendarCheck, CreditCard, TrendingUp } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 
 const LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/appointments", label: "Appointments", icon: CalendarDays },
   { href: "/dashboard/schedule", label: "Schedule", icon: Clock },
+  { href: "/dashboard/visibility", label: "Visibility", icon: TrendingUp },
   { href: "/dashboard/billing", label: "Billing & Plan", icon: CreditCard },
 ];
 
