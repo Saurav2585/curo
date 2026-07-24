@@ -6,6 +6,7 @@ import { CalendarClock, Users, Activity, XCircle, Clock } from "lucide-react";
 import { getMyDoctor, clinicTzToday } from "@/lib/doctor";
 import { createClient } from "@/lib/supabase/server";
 import { getProviderSubscription } from "@/lib/subscription";
+import { PromotionSlot } from "@/components/promotion-slot";
 import { slotTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -177,6 +178,11 @@ export default async function DashboardPage() {
           </Link>
         </div>
       )}
+
+      {/* Promotion slot — provider trial placement */}
+      <div className="mb-6">
+        <PromotionSlot placement="trial" plan={sub.plan} />
+      </div>
 
       {/* KPIs — the "are we busy today?" answer, above the detail */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

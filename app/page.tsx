@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SiteHeader } from "@/components/site-header";
 import { HeroMockup } from "@/components/hero-mockup";
 import { Reveal } from "@/components/reveal";
+import { PromotionSlot } from "@/components/promotion-slot";
 import type { Specialty } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -77,6 +78,11 @@ export default async function HomePage() {
             <HeroMockup />
           </Reveal>
         </section>
+
+        {/* Promotion slot — patient offers only (audience resolves to patient publicly) */}
+        <div className="mx-auto max-w-6xl px-6">
+          <PromotionSlot placement="landing" />
+        </div>
 
         {/* ================================================= PROBLEM */}
         <section className="border-t border-[var(--border-subtle)]">

@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { PlanComparison } from "@/components/plan-comparison";
 import { PlanBadge } from "@/components/plan-badge";
 import { LifecycleNotice } from "@/components/lifecycle-notice";
+import { PromotionSlot } from "@/components/promotion-slot";
 import { getPatientMembership } from "@/lib/subscription";
 import { PATIENT_PLANS, patientPlanName } from "@/lib/plans";
 
@@ -22,6 +23,11 @@ export default async function MembershipPage() {
       <main className="mx-auto max-w-3xl px-6 py-12">
         <p className="t-eyebrow">Account</p>
         <h1 className="t-h1 mt-2">Membership</h1>
+
+        {/* Promotion slot — membership placement */}
+        <div className="mt-6">
+          <PromotionSlot placement="membership" plan={membership.plan} />
+        </div>
 
         {/* Current plan + usage */}
         <div className="mt-6 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">

@@ -6,6 +6,7 @@ import { getProviderSubscription } from "@/lib/subscription";
 import { PlanComparison } from "@/components/plan-comparison";
 import { PlanBadge, PlanStatus } from "@/components/plan-badge";
 import { LifecycleNotice } from "@/components/lifecycle-notice";
+import { PromotionSlot } from "@/components/promotion-slot";
 import { PROVIDER_PLANS, ENTERPRISE_PLAN } from "@/lib/plans";
 import { planName } from "@/lib/entitlements";
 import { slotFull } from "@/lib/format";
@@ -97,6 +98,11 @@ export default async function BillingPage() {
   return (
     <main className="p-8">
       <h1 className="text-[1.75rem] font-bold tracking-tight text-[var(--text-primary)]">Billing &amp; Plan</h1>
+
+      {/* Promotion slot — provider billing placement */}
+      <div className="mt-6 max-w-2xl">
+        <PromotionSlot placement="billing" plan={sub.plan} />
+      </div>
 
       {/* Current plan + state */}
       <div className="mt-6 max-w-2xl rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">
