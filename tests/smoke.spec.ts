@@ -69,6 +69,8 @@ test("patient can sign up and reach an empty bookings page", async ({ page }, te
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/sign-up"), { timeout: 15_000 });
   await checkPage(page, "/bookings", testInfo);
+  // Patient membership page is reachable and healthy.
+  await checkPage(page, "/account/membership", testInfo);
 });
 
 // ---------------------------------------------------------------- provider journey
@@ -94,11 +96,13 @@ test("a new provider applicant creates a draft and is gated out of the dashboard
 test.describe("doctor portal", () => {
   const DOCTOR_ROUTES = ["/dashboard", "/dashboard/appointments", "/dashboard/schedule"];
 
+  const ALL_DOCTOR_ROUTES = [...DOCTOR_ROUTES, "/dashboard/billing"];
+
   test("doctor can sign in and every portal page is healthy", async ({ page }, testInfo) => {
     await signIn(page, DOCTOR.email, DOCTOR.password);
     // Role-aware redirect should land a doctor in the portal.
     await expect(page).toHaveURL(/\/dashboard/);
-    for (const route of DOCTOR_ROUTES) {
+    for (const route of ALL_DOCTOR_ROUTES) {
       await checkPage(page, route, testInfo);
     }
   });

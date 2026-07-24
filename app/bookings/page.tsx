@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarX2, ChevronRight } from "lucide-react";
+import { CalendarX2, ChevronRight, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { cancelBooking } from "./actions";
 import { slotFull } from "@/lib/format";
+import { getPatientMembership } from "@/lib/subscription";
+import { patientPlanName } from "@/lib/plans";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +56,8 @@ export default async function BookingsPage() {
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/sign-in?next=/bookings");
+
+  const membership = await getPatientMembership();
 
   const { data: rows } = await supabase
     .from("appointments")
@@ -136,6 +140,33 @@ export default async function BookingsPage() {
 
       <main className="mx-auto max-w-3xl px-6 py-14">
         <h1 className="t-h1">My bookings</h1>
+
+        {/* Free-plan membership card — hidden for members on the highest tier */}
+        {membership?.isFree && (
+          <div className="mt-6 flex flex-col items-start justify-between gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-brandSubtle)] p-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--bg-surface)]">
+                <Sparkles size={18} color="var(--text-brand)" aria-hidden />
+              </span>
+              <div>
+                <p className="text-[0.875rem] font-medium text-[var(--text-primary)]">
+                  {patientPlanName(membership.plan)} plan ·{" "}
+                  <span className="tabular">{membership.remaining}</span> free appointments left this month
+                </p>
+                <p className="text-[0.8125rem] text-[var(--text-muted)]">
+                  Upgrade to Curo Plus for SMS reminders, family profiles and clinic discounts.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/account/membership"
+              className="shrink-0 rounded-[var(--radius-md)] px-4 py-2 text-[0.875rem] font-medium"
+              style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
+            >
+              Upgrade
+            </Link>
+          </div>
+        )}
 
         {bookings.length === 0 ? (
           /* Empty state — a CTA, never a dead end */

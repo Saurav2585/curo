@@ -1,9 +1,11 @@
 import { Fragment } from "react";
 import type { ComponentType } from "react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarClock, Users, Activity, XCircle } from "lucide-react";
+import { CalendarClock, Users, Activity, XCircle, Clock } from "lucide-react";
 import { getMyDoctor, clinicTzToday } from "@/lib/doctor";
 import { createClient } from "@/lib/supabase/server";
+import { getProviderSubscription } from "@/lib/subscription";
 import { slotTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -91,6 +93,10 @@ export default async function DashboardPage() {
 
   const today = clinicTzToday();
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const sub = await getProviderSubscription(doctor.id, user!.id);
 
   const [{ data: statsRows, error: statsError }, { data: appts }] = await Promise.all([
     supabase.rpc("doctor_day_stats", { p_doctor_id: doctor.id, p_date: today }),
@@ -130,6 +136,47 @@ export default async function DashboardPage() {
           {doctor.specialties?.name} · {doctor.clinics?.name}
         </p>
       </header>
+
+      {/* Trial status card — quiet by default, emphasised under 7 days. Never a popup. */}
+      {sub.onTrial && (
+        <div
+          className="mb-6 flex flex-col items-start justify-between gap-3 rounded-[var(--radius-lg)] border p-5 sm:flex-row sm:items-center"
+          style={
+            sub.trialUrgent
+              ? { borderColor: "var(--color-amber-500)", background: "var(--bg-warnSubtle)" }
+              : { borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }
+          }
+        >
+          <div className="flex items-center gap-3">
+            <span
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+              style={{ background: sub.trialUrgent ? "var(--bg-surface)" : "var(--bg-brandSubtle)" }}
+            >
+              <Clock size={20} color={sub.trialUrgent ? "var(--text-warn)" : "var(--text-brand)"} aria-hidden />
+            </span>
+            <div>
+              <p className="font-semibold text-[var(--text-primary)]">
+                Professional Trial ·{" "}
+                <span className="tabular" style={sub.trialUrgent ? { color: "var(--text-warn)" } : undefined}>
+                  {sub.daysRemaining} {sub.daysRemaining === 1 ? "day" : "days"} remaining
+                </span>
+              </p>
+              <p className="text-[0.8125rem] text-[var(--text-muted)]">
+                {sub.trialUrgent
+                  ? "Your trial ends soon — choose a plan to keep analytics and reminders."
+                  : "You're on the full Pro experience. No card required."}
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/dashboard/billing"
+            className="shrink-0 rounded-[var(--radius-md)] px-4 py-2 text-[0.875rem] font-medium"
+            style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
+          >
+            View plans
+          </Link>
+        </div>
+      )}
 
       {/* KPIs — the "are we busy today?" answer, above the detail */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

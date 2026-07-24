@@ -44,6 +44,14 @@ export async function SiteHeader() {
               >
                 {isDoctor ? "Dashboard" : "My bookings"}
               </Link>
+              {!isDoctor && (
+                <Link
+                  href="/account/membership"
+                  className="hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:block"
+                >
+                  Membership
+                </Link>
+              )}
               <form action={signOut}>
                 <button
                   type="submit"
