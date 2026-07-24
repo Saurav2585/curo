@@ -27,13 +27,16 @@ export default async function BookPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ date?: string }>;
+  searchParams: Promise<{ date?: string; slot?: string }>;
 }) {
-  const [{ slug }, { date }] = await Promise.all([params, searchParams]);
+  const [{ slug }, { date, slot }] = await Promise.all([params, searchParams]);
   const { doctor } = await getDoctorBySlug(slug);
   if (!doctor) notFound();
 
-  const selectedDate = date ?? todayInClinicTz();
+  // When arriving from a "next available" chip we get a full slot timestamp.
+  // Open the grid on that slot's date and pre-select it.
+  const slotDate = slot ? slot.slice(0, 10) : null;
+  const selectedDate = date ?? slotDate ?? todayInClinicTz();
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_available_slots", {
@@ -166,6 +169,7 @@ export default async function BookPage({
                   slots={slots}
                   doctorSlug={doctor.slug}
                   fee={formatFee(doctor.consultation_fee)}
+                  initialSelected={slot}
                 />
               </div>
             </>
@@ -178,6 +182,7 @@ export default async function BookPage({
                   slots={slots}
                   doctorSlug={doctor.slug}
                   fee={formatFee(doctor.consultation_fee)}
+                  initialSelected={slot}
                 />
               </div>
             </>

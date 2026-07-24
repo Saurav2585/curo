@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Star, MapPin, Clock } from "lucide-react";
 import type { DoctorRow } from "@/lib/queries";
 import { formatFee, slotDay, slotTime } from "@/lib/format";
+import { doctorPhoto } from "@/lib/doctor-photo";
 
 function initials(fullName: string) {
   return fullName
@@ -25,10 +26,18 @@ export function DoctorCard({
       <div className="flex gap-4">
         <span
           aria-hidden
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-[1rem] font-semibold"
+          className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full text-[1rem] font-semibold"
           style={{ background: "var(--bg-brandSubtle)", color: "var(--text-brand)" }}
         >
           {initials(doctor.full_name)}
+          {doctorPhoto(doctor.slug) && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={doctorPhoto(doctor.slug)!}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
         </span>
 
         <div className="min-w-0 flex-1">

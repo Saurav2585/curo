@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Star, MapPin, Clock, Languages, GraduationCap } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { getDoctorBySlug, getNextSlots } from "@/lib/queries";
+import { doctorPhoto } from "@/lib/doctor-photo";
 import { formatFee, slotDay, slotTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -47,13 +48,21 @@ export default async function DoctorProfilePage({
             <div className="flex gap-5">
               <span
                 aria-hidden
-                className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full text-[1.5rem] font-semibold"
+                className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full text-[1.5rem] font-semibold"
                 style={{
                   background: "var(--bg-brandSubtle)",
                   color: "var(--text-brand)",
                 }}
               >
                 {initials(doctor.full_name)}
+                {doctorPhoto(doctor.slug) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={doctorPhoto(doctor.slug)!}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                )}
               </span>
 
               <div>

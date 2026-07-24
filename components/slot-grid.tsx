@@ -114,13 +114,22 @@ export function SlotGrid({
   slots,
   doctorSlug,
   fee,
+  initialSelected,
 }: {
   slots: Slot[];
   doctorSlug: string;
   fee: string;
+  /** A slot to pre-select when arriving from a "next available" chip. Only
+   *  honoured if it's actually an available slot in this day's grid. */
+  initialSelected?: string;
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<string | null>(null);
+  const preselect =
+    initialSelected &&
+    slots.some((s) => s.slot_start === initialSelected && s.status === "available")
+      ? initialSelected
+      : null;
+  const [selected, setSelected] = useState<string | null>(preselect);
 
   const sessions = groupIntoSessions(slots);
 
