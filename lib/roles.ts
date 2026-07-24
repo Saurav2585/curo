@@ -23,8 +23,10 @@ export async function getSessionRole(): Promise<
   return { userId: user.id, role: (data?.role as "patient" | "doctor" | "admin") ?? "patient" };
 }
 
-/** The correct landing page for a role. Doctors live in the portal; everyone
- *  else lives in the patient app. */
+/** The correct landing page for a role. Admins get the console, doctors the
+ *  portal, everyone else the patient app. */
 export function roleHome(role: "patient" | "doctor" | "admin"): string {
-  return role === "doctor" ? "/dashboard" : "/bookings";
+  if (role === "admin") return "/admin";
+  if (role === "doctor") return "/dashboard";
+  return "/bookings";
 }

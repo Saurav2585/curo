@@ -119,3 +119,8 @@ test("logged-out doctor area redirects to sign in", async ({ page }) => {
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/sign-in/);
 });
+
+test("logged-out admin console redirects to sign in", async ({ page }) => {
+  await page.goto("/admin");
+  await expect(page).toHaveURL(/\/sign-in/);
+});

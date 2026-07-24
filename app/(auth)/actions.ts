@@ -54,7 +54,9 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
     .select("role")
     .eq("id", data.user!.id)
     .maybeSingle();
-  redirect(profile?.role === "doctor" ? "/dashboard" : "/bookings");
+  redirect(
+    profile?.role === "admin" ? "/admin" : profile?.role === "doctor" ? "/dashboard" : "/bookings"
+  );
 }
 
 export async function signUp(_prev: AuthState, formData: FormData): Promise<AuthState> {
