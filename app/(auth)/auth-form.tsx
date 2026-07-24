@@ -1,18 +1,23 @@
 "use client";
 
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { useActionState } from "react";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 import { signIn, signUp, type AuthState } from "./actions";
+import { SocialAuth } from "./social-auth";
 
-function SubmitButton({ label }: { label: string }) {
+const INPUT =
+  "mt-1 h-11 w-full rounded-[var(--radius-md)] border border-[var(--border-control)] bg-[var(--bg-surface)] px-3 text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:outline-none";
+const LABEL = "text-[0.8125rem] font-medium text-[var(--text-secondary)]";
+
+function SubmitButton({ label, disabled }: { label: string; disabled?: boolean }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
-      disabled={pending}
-      className="h-12 w-full rounded-[var(--radius-md)] font-medium disabled:opacity-60"
+      disabled={pending || disabled}
+      className="h-12 w-full rounded-[var(--radius-md)] font-medium disabled:cursor-not-allowed disabled:opacity-50"
       style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
     >
       {pending ? "One moment…" : label}
@@ -27,76 +32,131 @@ export function AuthForm({
   mode: "sign-in" | "sign-up";
   next?: string;
 }) {
-  const action = mode === "sign-in" ? signIn : signUp;
+  const isSignUp = mode === "sign-up";
+  const action = isSignUp ? signUp : signIn;
   const [state, formAction] = useActionState<AuthState, FormData>(action, null);
 
-  const isSignUp = mode === "sign-up";
+  // Client-side validation state (sign-up only; sign-in uses native + server).
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [agreed, setAgreed] = useState(false);
+
+  const mismatch = isSignUp && confirm.length > 0 && confirm !== password;
+  const canSubmit = !isSignUp || (agreed && password.length >= 6 && confirm === password);
 
   return (
-    <form action={formAction} className="space-y-4">
-      {next && <input type="hidden" name="next" value={next} />}
+    <div className="space-y-5">
+      <SocialAuth next={next} />
 
-      {isSignUp && (
+      <form action={formAction} className="space-y-4" noValidate>
+        {next && <input type="hidden" name="next" value={next} />}
+
+        {isSignUp && (
+          <div>
+            <label htmlFor="full_name" className={LABEL}>Full name</label>
+            <input id="full_name" name="full_name" autoComplete="name" required className={INPUT} />
+          </div>
+        )}
+
         <div>
-          <label htmlFor="full_name" className="text-[0.8125rem] font-medium text-[var(--text-secondary)]">
-            Full name
-          </label>
+          <label htmlFor="email" className={LABEL}>Email</label>
+          <input id="email" name="email" type="email" autoComplete="email" required className={INPUT} />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className={LABEL}>Password</label>
+            {!isSignUp && (
+              <Link
+                href={`/reset-password${next ? `?next=${encodeURIComponent(next)}` : ""}`}
+                className="text-[0.75rem] text-[var(--text-muted)] hover:text-[var(--text-brand)] hover:underline"
+              >
+                Forgot password?
+              </Link>
+            )}
+          </div>
           <input
-            id="full_name"
-            name="full_name"
-            autoComplete="name"
-            className="mt-1 h-11 w-full rounded-[var(--radius-md)] border border-[var(--border-control)] bg-[var(--bg-surface)] px-3 text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:outline-none"
+            id="password"
+            name="password"
+            type="password"
+            autoComplete={isSignUp ? "new-password" : "current-password"}
+            required
+            minLength={isSignUp ? 6 : undefined}
+            value={isSignUp ? password : undefined}
+            onChange={isSignUp ? (e) => setPassword(e.target.value) : undefined}
+            className={INPUT}
           />
         </div>
-      )}
 
-      <div>
-        <label htmlFor="email" className="text-[0.8125rem] font-medium text-[var(--text-secondary)]">
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          className="mt-1 h-11 w-full rounded-[var(--radius-md)] border border-[var(--border-control)] bg-[var(--bg-surface)] px-3 text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:outline-none"
-        />
-      </div>
+        {isSignUp && (
+          <div>
+            <label htmlFor="confirm_password" className={LABEL}>Confirm password</label>
+            <input
+              id="confirm_password"
+              name="confirm_password"
+              type="password"
+              autoComplete="new-password"
+              required
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              aria-invalid={mismatch}
+              className={INPUT}
+              style={mismatch ? { borderColor: "var(--border-danger)" } : undefined}
+            />
+            {mismatch && (
+              <p className="mt-1 text-[0.75rem] text-[var(--text-danger)]">
+                Passwords don&apos;t match.
+              </p>
+            )}
+          </div>
+        )}
 
-      <div>
-        <label htmlFor="password" className="text-[0.8125rem] font-medium text-[var(--text-secondary)]">
-          Password
-        </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete={isSignUp ? "new-password" : "current-password"}
-          className="mt-1 h-11 w-full rounded-[var(--radius-md)] border border-[var(--border-control)] bg-[var(--bg-surface)] px-3 text-[var(--text-primary)] focus:border-[var(--border-focus)] focus:outline-none"
-        />
-      </div>
+        {isSignUp && (
+          <label className="flex items-start gap-2.5 text-[0.8125rem] text-[var(--text-secondary)]">
+            <input
+              type="checkbox"
+              name="terms"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded accent-[var(--color-teal-500)]"
+            />
+            <span>
+              I agree to the{" "}
+              <Link href="/terms" className="font-medium text-[var(--text-brand)] hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="font-medium text-[var(--text-brand)] hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          </label>
+        )}
 
-      {state?.error && (
-        <div
-          className="flex items-start gap-2 rounded-[var(--radius-md)] border p-3 text-[0.8125rem]"
-          style={{ borderColor: "var(--border-danger)", background: "var(--bg-dangerSubtle)" }}
-        >
-          <AlertCircle size={16} color="var(--text-danger)" className="mt-0.5 shrink-0" aria-hidden />
-          <span className="text-[var(--text-danger)]">{state.error}</span>
-        </div>
-      )}
+        {state?.error && (
+          <div
+            className="flex items-start gap-2 rounded-[var(--radius-md)] border p-3 text-[0.8125rem]"
+            style={{ borderColor: "var(--border-danger)", background: "var(--bg-dangerSubtle)" }}
+            role="alert"
+          >
+            <AlertCircle size={16} color="var(--text-danger)" className="mt-0.5 shrink-0" aria-hidden />
+            <span className="text-[var(--text-danger)]">{state.error}</span>
+          </div>
+        )}
 
-      <SubmitButton label={isSignUp ? "Create account" : "Sign in"} />
+        <SubmitButton label={isSignUp ? "Create account" : "Sign in"} disabled={!canSubmit} />
 
-      <p className="text-center text-[0.875rem] text-[var(--text-muted)]">
-        {isSignUp ? "Already have an account? " : "New to Curo? "}
-        <Link
-          href={`/${isSignUp ? "sign-in" : "sign-up"}${next ? `?next=${encodeURIComponent(next)}` : ""}`}
-          className="font-medium text-[var(--text-brand)] hover:underline"
-        >
-          {isSignUp ? "Sign in" : "Create an account"}
-        </Link>
-      </p>
-    </form>
+        <p className="text-center text-[0.875rem] text-[var(--text-muted)]">
+          {isSignUp ? "Already have an account? " : "New to Curo? "}
+          <Link
+            href={`/${isSignUp ? "sign-in" : "sign-up"}${next ? `?next=${encodeURIComponent(next)}` : ""}`}
+            className="font-medium text-[var(--text-brand)] hover:underline"
+          >
+            {isSignUp ? "Sign in" : "Create an account"}
+          </Link>
+        </p>
+      </form>
+    </div>
   );
 }
