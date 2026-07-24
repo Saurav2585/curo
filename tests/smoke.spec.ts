@@ -45,10 +45,22 @@ test("slot grid renders and a slot can be selected", async ({ page }, testInfo) 
   }
 });
 
+// ---------------------------------------------------------------- signup chooser
+test("signup shows the two account-type journeys", async ({ page }, testInfo) => {
+  await checkPage(page, "/sign-up", testInfo);
+  await expect(page.getByText("Continue as a patient")).toBeVisible();
+  await expect(page.getByText("Continue as a doctor or clinic")).toBeVisible();
+});
+
+test("provider application page is healthy", async ({ page }, testInfo) => {
+  await checkPage(page, "/apply", testInfo);
+});
+
 // ---------------------------------------------------------------- patient journey
 test("patient can sign up and reach an empty bookings page", async ({ page }, testInfo) => {
   const email = `test_${Date.now()}@curo.demo`;
   await page.goto("/sign-up");
+  await page.getByText("Continue as a patient").click();
   await page.getByLabel("Full name").fill("Test Patient");
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill("Testpass123");
@@ -57,6 +69,30 @@ test("patient can sign up and reach an empty bookings page", async ({ page }, te
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/sign-up"), { timeout: 15_000 });
   await checkPage(page, "/bookings", testInfo);
+});
+
+// ---------------------------------------------------------------- provider journey
+test("a new provider applicant is gated out of the dashboard", async ({ page }) => {
+  const email = `provider_${Date.now()}@curo.demo`;
+  await page.goto("/apply");
+  await page.getByLabel("Full name").fill("Test Provider");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Phone (optional)").fill("+91 9800000000");
+  await page.getByLabel("Password", { exact: true }).fill("Provpass123");
+  await page.getByLabel("Confirm password").fill("Provpass123");
+  await page.getByLabel("Clinic / hospital name").fill("Test Clinic");
+  await page.getByLabel("City").fill("Bengaluru");
+  await page.getByLabel("Specialty").fill("Cardiology");
+  await page.getByLabel("Medical registration number").fill("REG123456");
+  await page.getByLabel("Qualifications").fill("MBBS, MD");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Submit application" }).click();
+  // Lands on the pending status page…
+  await expect(page).toHaveURL(/\/apply\/status/, { timeout: 15_000 });
+  await expect(page.getByText(/under review/i)).toBeVisible();
+  // …and cannot reach the dashboard (no doctor privileges yet).
+  await page.goto("/dashboard");
+  await expect(page).toHaveURL(/\/apply\/status/);
 });
 
 // ---------------------------------------------------------------- doctor journey

@@ -36,6 +36,12 @@ export function ResetForm() {
 
   return (
     <form action={formAction} className="space-y-4">
+      {/* Origin lets the reset email point back at this deployment's callback. */}
+      <input
+        type="hidden"
+        name="origin"
+        value={typeof window !== "undefined" ? window.location.origin : ""}
+      />
       <div>
         <label htmlFor="email" className="text-[0.8125rem] font-medium text-[var(--text-secondary)]">
           Email

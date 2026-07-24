@@ -138,12 +138,42 @@ export async function requestPasswordReset(
   formData: FormData
 ): Promise<VerifyState> {
   const email = String(formData.get("email") ?? "").trim();
+  const origin = String(formData.get("origin") ?? "").trim();
   if (!EMAIL_RE.test(email)) return { error: "Enter a valid email address." };
 
   const supabase = await createClient();
+  // The reset link returns via the OAuth/recovery callback, which exchanges the
+  // code for a session and forwards to the completion page.
+  const redirectTo = origin
+    ? `${origin}/auth/callback?next=/reset-password/update`
+    : undefined;
   // Harmless if the address has no account — Supabase does not reveal that.
-  await supabase.auth.resetPasswordForEmail(email);
+  await supabase.auth.resetPasswordForEmail(email, redirectTo ? { redirectTo } : undefined);
   return { info: "If that email has an account, a reset link is on its way." };
+}
+
+export async function updatePassword(
+  _prev: AuthState,
+  formData: FormData
+): Promise<AuthState> {
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm_password") ?? "");
+
+  if (password.length < 6) return { error: "Use a password of at least 6 characters." };
+  if (password !== confirm) return { error: "Passwords don't match." };
+
+  const supabase = await createClient();
+  // Only works with the recovery session established by the callback.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Your reset link has expired. Request a new one." };
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { error: error.message };
+
+  revalidatePath("/", "layout");
+  redirect("/bookings");
 }
 
 export async function signOut() {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CalendarCheck } from "lucide-react";
-import { AuthForm } from "../auth-form";
+import { SignupChooser } from "./signup-chooser";
 import { getSessionRole, roleHome } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
@@ -34,9 +34,9 @@ export default async function SignUpPage({
       <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">
         <h1 className="text-[1.5rem] font-semibold text-[var(--text-primary)]">Create your account</h1>
         <p className="mt-1 mb-6 text-[0.9375rem] text-[var(--text-muted)]">
-          Book appointments in seconds and keep them all in one place.
+          How would you like to use Curo?
         </p>
-        <AuthForm mode="sign-up" next={next} />
+        <SignupChooser next={next} />
       </div>
     </main>
   );
