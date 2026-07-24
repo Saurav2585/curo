@@ -119,11 +119,14 @@ export default async function MembershipPage() {
           </section>
         )}
 
-        <p className="mt-8 t-small">
+        <div className="mt-8 flex items-center justify-between t-small">
           <Link href="/bookings" className="font-medium text-[var(--text-brand)] hover:underline">
             ← Back to my bookings
           </Link>
-        </p>
+          <Link href="/account/billing" className="font-medium text-[var(--text-brand)] hover:underline">
+            Billing &amp; invoices →
+          </Link>
+        </div>
       </main>
     </>
   );

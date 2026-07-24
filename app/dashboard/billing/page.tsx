@@ -7,8 +7,11 @@ import { PlanComparison } from "@/components/plan-comparison";
 import { PlanBadge, PlanStatus } from "@/components/plan-badge";
 import { LifecycleNotice } from "@/components/lifecycle-notice";
 import { PromotionSlot } from "@/components/promotion-slot";
+import { InvoiceHistory } from "@/components/invoice-history";
+import { PaymentMethodsPlaceholder } from "@/components/payment-methods";
 import { PROVIDER_PLANS, ENTERPRISE_PLAN } from "@/lib/plans";
 import { planName } from "@/lib/entitlements";
+import { listInvoices } from "@/lib/billing";
 import { slotFull } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +45,7 @@ export default async function BillingPage() {
     data: { user },
   } = await supabase.auth.getUser();
   const sub = await getProviderSubscription(doctor.id, user!.id);
+  const invoices = await listInvoices(user!.id);
 
   // ---------------------------------------------------- Enterprise (hospital)
   if (sub.isEnterprise) {
@@ -168,10 +172,18 @@ export default async function BillingPage() {
         </section>
       )}
 
-      {/* Placeholders — ready for the billing phase */}
-      <section className="mt-10 grid max-w-4xl gap-4 sm:grid-cols-3">
-        <Placeholder icon={FileText} title="Billing history" body="Your payments will appear here once billing goes live." />
-        <Placeholder icon={FileText} title="Invoices" body="Downloadable GST invoices will live here." />
+      {/* Invoice history (GST invoices) */}
+      <section className="mt-10 max-w-4xl">
+        <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Invoice history</h2>
+        <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">GST invoices for your subscription.</p>
+        <div className="mt-4">
+          <InvoiceHistory invoices={invoices} />
+        </div>
+      </section>
+
+      {/* Payment method + visibility placeholders */}
+      <section className="mt-8 grid max-w-4xl gap-4 sm:grid-cols-2">
+        <PaymentMethodsPlaceholder />
         <Placeholder icon={Sparkles} title="Visibility packs" body="Featured & sponsored placement — coming soon." />
       </section>
     </main>

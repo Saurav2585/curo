@@ -69,8 +69,9 @@ test("patient can sign up and reach an empty bookings page", async ({ page }, te
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/sign-up"), { timeout: 15_000 });
   await checkPage(page, "/bookings", testInfo);
-  // Patient membership page is reachable and healthy.
+  // Patient membership + billing pages are reachable and healthy.
   await checkPage(page, "/account/membership", testInfo);
+  await checkPage(page, "/account/billing", testInfo);
 });
 
 // ---------------------------------------------------------------- provider journey
