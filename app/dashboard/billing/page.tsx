@@ -4,7 +4,10 @@ import { getMyDoctor } from "@/lib/doctor";
 import { createClient } from "@/lib/supabase/server";
 import { getProviderSubscription } from "@/lib/subscription";
 import { PlanComparison } from "@/components/plan-comparison";
+import { PlanBadge, PlanStatus } from "@/components/plan-badge";
+import { LifecycleNotice } from "@/components/lifecycle-notice";
 import { PROVIDER_PLANS, ENTERPRISE_PLAN } from "@/lib/plans";
+import { planName } from "@/lib/entitlements";
 import { slotFull } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -95,45 +98,69 @@ export default async function BillingPage() {
     <main className="p-8">
       <h1 className="text-[1.75rem] font-bold tracking-tight text-[var(--text-primary)]">Billing &amp; Plan</h1>
 
-      {/* Current plan + trial */}
+      {/* Current plan + state */}
       <div className="mt-6 max-w-2xl rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[0.8125rem] text-[var(--text-muted)]">Current plan</p>
             <p className="mt-0.5 flex items-center gap-2 text-[1.375rem] font-semibold text-[var(--text-primary)]">
-              {sub.onTrial ? "Professional Trial" : sub.plan === "pro" ? "Solo — Pro" : sub.plan === "clinic" ? "Clinic" : "Solo — Free"}
-              {sub.onTrial && <Sparkles size={18} color="var(--text-brand)" aria-hidden />}
+              {sub.onTrial ? "Professional Trial" : planName(sub.plan)}
+              <PlanBadge plan={sub.plan} />
             </p>
           </div>
-          {sub.onTrial && (
-            <span
-              className="tabular flex items-center gap-1.5 rounded-[var(--radius-full)] px-3 py-1 text-[0.8125rem] font-medium"
-              style={
-                sub.trialUrgent
-                  ? { background: "var(--bg-warnSubtle)", color: "var(--text-warn)" }
-                  : { background: "var(--bg-brandSubtle)", color: "var(--text-brand)" }
-              }
-            >
-              <Clock size={14} aria-hidden /> {sub.daysRemaining} days left
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            <PlanStatus state={sub.state} />
+            {sub.onTrial && (
+              <span
+                className="tabular flex items-center gap-1.5 rounded-[var(--radius-full)] px-3 py-1 text-[0.8125rem] font-medium"
+                style={
+                  sub.trialUrgent
+                    ? { background: "var(--bg-warnSubtle)", color: "var(--text-warn)" }
+                    : { background: "var(--bg-brandSubtle)", color: "var(--text-brand)" }
+                }
+              >
+                <Clock size={14} aria-hidden /> {sub.daysRemaining} days left
+              </span>
+            )}
+          </div>
         </div>
-        {sub.onTrial && sub.trialEndsAt && (
+
+        {/* Trial → keep-until note. Paid plans → renewal date. Clinic Pro → extras. */}
+        {sub.onTrial && sub.trialEndsAt ? (
           <p className="mt-3 border-t border-[var(--border-subtle)] pt-3 text-[0.875rem] text-[var(--text-muted)]">
             Your trial runs until <span className="tabular font-medium text-[var(--text-secondary)]">{slotFull(sub.trialEndsAt.toISOString())}</span>.
             You keep everything until then — no card required.
           </p>
+        ) : sub.renewalDate ? (
+          <p className="mt-3 border-t border-[var(--border-subtle)] pt-3 text-[0.875rem] text-[var(--text-muted)]">
+            Renews {sub.lifecycle.governingDate ? "on" : "monthly ·"}{" "}
+            <span className="tabular font-medium text-[var(--text-secondary)]">{slotFull(sub.renewalDate.toISOString())}</span>.
+          </p>
+        ) : null}
+
+        {sub.plan === "clinic" && (
+          <div className="mt-3 border-t border-[var(--border-subtle)] pt-3">
+            <p className="text-[0.8125rem] font-medium text-[var(--text-secondary)]">Included with Clinic Pro</p>
+            <p className="mt-1 text-[0.8125rem] text-[var(--text-muted)]">
+              Up to 10 doctors · per-doctor + clinic analytics · 3 reception seats · 1 branch.
+            </p>
+          </div>
         )}
       </div>
 
-      {/* Plan comparison */}
-      <section className="mt-10">
-        <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Compare plans</h2>
-        <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">Flat pricing, zero commission on every booking.</p>
-        <div className="mt-4 max-w-4xl">
-          <PlanComparison plans={PROVIDER_PLANS} currentPlanId={sub.onTrial ? undefined : sub.plan} />
-        </div>
-      </section>
+      {/* Lifecycle notice — expiring soon / grace / cancelled / expired */}
+      <LifecycleNotice lifecycle={sub.lifecycle} audience="provider" />
+
+      {/* Plan comparison — hidden on the highest self-serve tier (Clinic Pro) */}
+      {sub.showUpgrade && (
+        <section className="mt-10">
+          <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Compare plans</h2>
+          <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">Flat pricing, zero commission on every booking.</p>
+          <div className="mt-4 max-w-4xl">
+            <PlanComparison plans={PROVIDER_PLANS} currentPlanId={sub.onTrial ? undefined : sub.plan} />
+          </div>
+        </section>
+      )}
 
       {/* Placeholders — ready for the billing phase */}
       <section className="mt-10 grid max-w-4xl gap-4 sm:grid-cols-3">

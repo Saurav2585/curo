@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, ArrowUpCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { PlanComparison } from "@/components/plan-comparison";
+import { PlanBadge } from "@/components/plan-badge";
+import { LifecycleNotice } from "@/components/lifecycle-notice";
 import { getPatientMembership } from "@/lib/subscription";
 import { PATIENT_PLANS, patientPlanName } from "@/lib/plans";
 
@@ -28,10 +30,11 @@ export default async function MembershipPage() {
               <p className="text-[0.8125rem] text-[var(--text-muted)]">Current plan</p>
               <p className="mt-0.5 flex items-center gap-2 text-[1.375rem] font-semibold text-[var(--text-primary)]">
                 {patientPlanName(membership.plan)}
+                <PlanBadge plan={membership.plan} />
                 {membership.plan !== "free" && <Sparkles size={18} color="var(--text-brand)" aria-hidden />}
               </p>
             </div>
-            {!membership.isHighestTier && (
+            {membership.showUpgrade && (
               <a
                 href="#plans"
                 className="shrink-0 rounded-[var(--radius-md)] px-4 py-2 text-[0.875rem] font-medium"
@@ -64,6 +67,21 @@ export default async function MembershipPage() {
                 <span className="tabular font-medium text-[var(--text-secondary)]">{membership.remaining}</span> free
                 appointments remaining this month.
               </p>
+
+              {/* Over the complimentary limit → recommend, never block */}
+              {membership.overLimit && (
+                <div
+                  className="mt-3 flex items-start gap-2 rounded-[var(--radius-md)] border p-3 text-[0.8125rem]"
+                  style={{ borderColor: "var(--border-brand)", background: "var(--bg-surface)" }}
+                >
+                  <ArrowUpCircle size={16} color="var(--text-brand)" className="mt-0.5 shrink-0" aria-hidden />
+                  <span className="text-[var(--text-secondary)]">
+                    You&apos;ve used your 3 complimentary appointments this month. You can still book as
+                    normal — upgrade to <strong className="text-[var(--text-primary)]">Care+</strong> for
+                    unlimited appointments, faster booking and lab discounts.
+                  </span>
+                </div>
+              )}
             </div>
           )}
 
@@ -81,8 +99,11 @@ export default async function MembershipPage() {
           </div>
         </div>
 
-        {/* Compare / upgrade */}
-        {!membership.isHighestTier && (
+        {/* Lifecycle notice — expiring soon / grace / cancelled / expired */}
+        <LifecycleNotice lifecycle={membership.lifecycle} audience="patient" />
+
+        {/* Compare / upgrade — hidden entirely on the highest tier */}
+        {membership.showUpgrade && (
           <section id="plans" className="mt-10">
             <h2 className="t-h3">Compare plans</h2>
             <p className="t-small mt-1">Upgrade any time. Free booking always stays free.</p>

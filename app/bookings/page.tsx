@@ -141,8 +141,8 @@ export default async function BookingsPage() {
       <main className="mx-auto max-w-3xl px-6 py-14">
         <h1 className="t-h1">My bookings</h1>
 
-        {/* Free-plan membership card — hidden for members on the highest tier */}
-        {membership?.isFree && (
+        {/* Free-plan membership card — shown only when an upgrade exists (never on the highest tier) */}
+        {membership?.showUpgrade && (
           <div className="mt-6 flex flex-col items-start justify-between gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-brandSubtle)] p-4 sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--bg-surface)]">
@@ -151,10 +151,18 @@ export default async function BookingsPage() {
               <div>
                 <p className="text-[0.875rem] font-medium text-[var(--text-primary)]">
                   {patientPlanName(membership.plan)} plan ·{" "}
-                  <span className="tabular">{membership.remaining}</span> free appointments left this month
+                  {membership.overLimit ? (
+                    <span>complimentary appointments used this month</span>
+                  ) : (
+                    <>
+                      <span className="tabular">{membership.remaining}</span> free appointments left this month
+                    </>
+                  )}
                 </p>
                 <p className="text-[0.8125rem] text-[var(--text-muted)]">
-                  Upgrade to Curo Plus for SMS reminders, family profiles and clinic discounts.
+                  {membership.overLimit
+                    ? "Keep booking as normal — upgrade to Care+ for unlimited appointments."
+                    : "Upgrade to Care+ for unlimited appointments, SMS reminders and lab discounts."}
                 </p>
               </div>
             </div>
