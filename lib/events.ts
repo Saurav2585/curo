@@ -1,13 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
-
 /**
  * The event catalogue — the platform's communication layer. Every meaningful
  * thing that happens is an event; notifications (and future email / SMS / push)
  * consume events. To add an event: add the value to the `app_event_type` DB enum
  * (migration) and a metadata entry here. Nothing else needs to change.
  *
- * Emission is centralised in `emitEvent()` below, which calls the security-
- * definer `emit_notification` RPC. No page creates notifications directly.
+ * This module is PURE (no server imports) so it is safe to import from client
+ * components (e.g. the notification menu). Emission — the only server-side part —
+ * lives in `lib/events-server.ts` (`emitEvent`), which calls the security-definer
+ * `emit_notification` RPC. No page creates notifications directly.
  */
 
 export type AppEventType =
@@ -70,40 +70,3 @@ export const APP_EVENT_TYPES = Object.keys(EVENT_CATALOGUE) as AppEventType[];
 
 export const eventMeta = (type: AppEventType): EventMeta =>
   EVENT_CATALOGUE[type] ?? { label: "Notification", icon: "calendar-check", tone: "muted", audience: [] };
-
-/**
- * Centralised event emission. Logs the event and materialises an in-app
- * notification for the recipient (via the security-definer RPC). Title defaults
- * to the catalogue label. Future channels reuse this same entry point.
- *
- * Reusable and side-effect-only for notifications — it does not send email / SMS
- * / push and is not wired into any existing flow yet.
- */
-export async function emitEvent(input: {
-  recipientId: string;
-  type: AppEventType;
-  title?: string;
-  message?: string;
-  actionUrl?: string;
-  channel?: NotificationChannel;
-  actorId?: string;
-  subjectType?: string;
-  subjectId?: string;
-  payload?: Record<string, unknown>;
-}): Promise<string | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("emit_notification", {
-    p_recipient: input.recipientId,
-    p_event: input.type,
-    p_title: input.title ?? eventMeta(input.type).label,
-    p_message: input.message ?? null,
-    p_action_url: input.actionUrl ?? null,
-    p_channel: input.channel ?? "in_app",
-    p_actor: input.actorId ?? null,
-    p_subject_type: input.subjectType ?? null,
-    p_subject_id: input.subjectId ?? null,
-    p_payload: input.payload ?? {},
-  });
-  if (error) return null;
-  return data as string;
-}
