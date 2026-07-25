@@ -5,6 +5,10 @@ import { SiteHeader } from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { cancelBooking } from "../actions";
 import { slotFull, formatFee } from "@/lib/format";
+import { getLifecycleEvents } from "@/lib/workflow-server";
+import { currentState, buildTimeline, nextStepHint } from "@/lib/workflow";
+import { WorkflowBadge } from "@/components/workflow-badge";
+import { AppointmentTimeline } from "@/components/appointment-timeline";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +42,7 @@ export default async function BookingConfirmationPage({
   const { data: booking } = await supabase
     .from("appointments")
     .select(
-      `id, reference, starts_at, ends_at, status, reason, patient_name,
+      `id, reference, starts_at, ends_at, status, reason, patient_name, created_at, cancelled_at,
        doctors ( full_name, slug, specialties ( name ), clinics ( name, address_line, city ) )`
     )
     .eq("id", id)
@@ -50,6 +54,18 @@ export default async function BookingConfirmationPage({
   const doctor = (booking as any).doctors;
   const clinic = doctor?.clinics;
   const cancelled = booking.status === "cancelled";
+
+  // Lifecycle overlay (display-only; booking behaviour is unchanged).
+  const lifecycleEvents = await getLifecycleEvents(booking.id);
+  const state = currentState({ baseStatus: booking.status, events: lifecycleEvents });
+  const timeline = buildTimeline({
+    createdAt: booking.created_at,
+    baseStatus: booking.status,
+    cancelledAt: booking.cancelled_at,
+    startsAt: booking.starts_at,
+    events: lifecycleEvents,
+  });
+  const nextStep = nextStepHint(state);
 
   return (
     <>
@@ -106,6 +122,23 @@ export default async function BookingConfirmationPage({
             </p>
           </div>
         </div>
+
+        {/* Appointment lifecycle — status, timeline, next step */}
+        <section className="mt-6 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+          <div className="flex items-center justify-between">
+            <p className="text-[0.75rem] uppercase tracking-wide text-[var(--text-muted)]">Status</p>
+            <WorkflowBadge state={state} />
+          </div>
+          {nextStep && (
+            <p className="mt-3 rounded-[var(--radius-md)] bg-[var(--bg-brandSubtle)] px-3 py-2 text-[0.8125rem] text-[var(--text-brand)]">
+              Next: {nextStep}
+            </p>
+          )}
+          <div className="mt-4">
+            <p className="mb-2 text-[0.75rem] uppercase tracking-wide text-[var(--text-muted)]">Timeline</p>
+            <AppointmentTimeline entries={timeline} />
+          </div>
+        </section>
 
         {!cancelled && (
           <>

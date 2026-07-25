@@ -90,6 +90,7 @@ export default async function AppointmentsPage({
                   <th className="px-4 py-3 font-medium">Phone</th>
                   <th className="px-4 py-3 font-medium">Reason</th>
                   <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium"></th>
                 </tr>
               </thead>
               <tbody>
@@ -107,6 +108,14 @@ export default async function AppointmentsPage({
                     <td className="px-4 py-3 text-[var(--text-muted)]">{a.reason || "—"}</td>
                     <td className="px-4 py-3">
                       <StatusBadge status={a.status} />
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/dashboard/appointments/${a.id}`}
+                        className="text-[0.8125rem] font-medium text-[var(--text-brand)] hover:underline"
+                      >
+                        Lifecycle
+                      </Link>
                     </td>
                   </tr>
                 ))}

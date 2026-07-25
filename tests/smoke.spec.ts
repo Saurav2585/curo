@@ -110,6 +110,24 @@ test.describe("doctor portal", () => {
   });
 });
 
+// ---------------------------------------------------------------- appointment lifecycle
+test("workflow engine keeps its transition map self-consistent", async () => {
+  // Pure engine invariant, no UI: terminal states have no outgoing transitions
+  // and every listed transition points at a real state.
+  const {
+    ALL_WORKFLOW_STATES, allowedTransitions, isTerminal, canTransition,
+  } = await import("../lib/workflow");
+  for (const s of ALL_WORKFLOW_STATES) {
+    for (const to of allowedTransitions(s)) {
+      expect(ALL_WORKFLOW_STATES).toContain(to);
+      expect(canTransition(s, to)).toBe(true);
+    }
+    if (isTerminal(s)) expect(allowedTransitions(s)).toHaveLength(0);
+  }
+  // A known illegal transition stays illegal.
+  expect(canTransition("cancelled", "completed")).toBe(false);
+});
+
 // ---------------------------------------------------------------- notifications
 test("notification bell renders for a signed-in doctor", async ({ page }) => {
   await signIn(page, DOCTOR.email, DOCTOR.password);

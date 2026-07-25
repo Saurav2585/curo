@@ -1,10 +1,14 @@
 import { Check } from "lucide-react";
 import type { Plan } from "@/lib/plans";
+import { CheckoutButton } from "@/components/checkout-button";
+
+const PURCHASABLE = new Set(["care_plus", "pro", "clinic"]);
 
 /**
- * Reuses the pricing-card visual language for in-app plan comparison. In this
- * foundation phase there is no checkout, so the CTA is a clear, honest
- * "Coming soon" — the layout is ready for billing to slot in later.
+ * Reuses the pricing-card visual language for in-app plan comparison. Paid,
+ * purchasable plans (Care+, Professional, Clinic Pro) get a live Razorpay
+ * checkout button; the current plan and non-purchasable tiers keep the plain
+ * label. The card layout itself is unchanged.
  */
 export function PlanComparison({
   plans,
@@ -50,14 +54,20 @@ export function PlanComparison({
               <span className="text-[0.8125rem] text-[var(--text-muted)]">{plan.cycle}</span>
             </p>
 
-            <button
-              type="button"
-              disabled
-              className="mt-4 h-10 w-full cursor-not-allowed rounded-[var(--radius-md)] border border-[var(--border-control)] text-[0.875rem] font-medium text-[var(--text-muted)]"
-              title="Billing launches soon"
-            >
-              {isCurrent ? "Current plan" : "Coming soon"}
-            </button>
+            {!isCurrent && PURCHASABLE.has(plan.id) ? (
+              <CheckoutButton
+                plan={plan.id as "care_plus" | "pro" | "clinic"}
+                label={`Upgrade to ${plan.name}`}
+              />
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="mt-4 h-10 w-full cursor-not-allowed rounded-[var(--radius-md)] border border-[var(--border-control)] text-[0.875rem] font-medium text-[var(--text-muted)]"
+              >
+                {isCurrent ? "Current plan" : "Contact sales"}
+              </button>
+            )}
 
             <ul className="mt-5 space-y-2.5">
               {plan.benefits.map((b) => (
