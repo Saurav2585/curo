@@ -18,6 +18,7 @@ export type RankingFactors = {
   completeness: number;  // 0–100
   subscriptionTier: SubscriptionTier;
   sponsoredWeight: number;
+  reputationScore?: number; // 0–100 (from lib/reviews). Optional; weight is 0 by default.
 };
 
 /** Every knob in one object — tune ranking without touching the algorithm. */
@@ -29,6 +30,7 @@ export type RankingConfig = {
   reviewSaturation: number;
   completenessWeight: number; // applied to completeness/100
   tier: Record<SubscriptionTier, number>;
+  reputationWeight: number;   // applied to reputationScore/100 (0 keeps ordering unchanged)
 };
 
 export const DEFAULT_RANKING_CONFIG: RankingConfig = {
@@ -39,6 +41,9 @@ export const DEFAULT_RANKING_CONFIG: RankingConfig = {
   reviewSaturation: 100,
   completenessWeight: 15,
   tier: { trial: 0, free: 0, pro: 5, clinic: 8, enterprise: 10 },
+  // Reputation is available to the engine but weighted 0 for now, so scores and
+  // search ordering are unchanged until we deliberately turn it up.
+  reputationWeight: 0,
 };
 
 export type RankingContribution = { label: string; points: number };
@@ -56,6 +61,7 @@ export function rankingBreakdown(
     { label: "Reviews", points: round(Math.min(f.reviewCount / config.reviewSaturation, 1) * config.reviewWeight) },
     { label: "Profile completeness", points: round((f.completeness / 100) * config.completenessWeight) },
     { label: "Subscription tier", points: round(config.tier[f.subscriptionTier]) },
+    { label: "Reputation", points: round(((f.reputationScore ?? 0) / 100) * config.reputationWeight) },
     { label: "Sponsored weight", points: round(f.sponsoredWeight) },
   ];
 }

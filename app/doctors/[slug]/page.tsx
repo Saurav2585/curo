@@ -5,6 +5,15 @@ import { SiteHeader } from "@/components/site-header";
 import { getDoctorBySlug, getNextSlots } from "@/lib/queries";
 import { doctorPhoto } from "@/lib/doctor-photo";
 import { formatFee, slotDay, slotTime } from "@/lib/format";
+import { listPublishedReviews, computeReputation } from "@/lib/reviews";
+import {
+  RatingSummary,
+  RatingDistribution,
+  DimensionAverages,
+  ReviewCard,
+} from "@/components/reviews";
+import { getWeeklyRules, getPublicAbsences, availabilityStatus } from "@/lib/schedule";
+import { AvailabilityBadge } from "@/components/availability-status";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +38,19 @@ export default async function DoctorProfilePage({
 
   const slotsByDoctor = await getNextSlots([doctor.id], 6);
   const slots = slotsByDoctor[doctor.id] ?? [];
+
+  // Patient reviews are additive to the profile — a separate, verified-visit
+  // reputation section. The headline rating above stays as-is.
+  const reviews = await listPublishedReviews(doctor.id);
+  const reputation = computeReputation(reviews);
+
+  // Availability status is display-only. Booking still runs on the unchanged
+  // slot engine — this badge only tells patients if the provider is on leave.
+  const [weeklyRules, absences] = await Promise.all([
+    getWeeklyRules(doctor.id),
+    getPublicAbsences(doctor.id),
+  ]);
+  const availability = availabilityStatus({ weeklyRules, events: absences });
 
   return (
     <>
@@ -85,6 +107,9 @@ export default async function DoctorProfilePage({
                     <span className="tabular">{doctor.experience_years}</span> years
                     experience
                   </span>
+                </div>
+                <div className="mt-3">
+                  <AvailabilityBadge status={availability} />
                 </div>
               </div>
             </div>
@@ -203,6 +228,40 @@ export default async function DoctorProfilePage({
             </div>
           </aside>
         </div>
+
+        {/* Patient reviews — verified visits only. Additive section. */}
+        {reputation.count > 0 && (
+          <section className="mt-12 border-t border-[var(--border-subtle)] pt-10">
+            <h2 className="text-[1.5rem] font-semibold tracking-tight text-[var(--text-primary)]">
+              Patient reviews
+            </h2>
+            <p className="mt-1 text-[0.9375rem] text-[var(--text-muted)]">
+              From patients who completed a visit — every review is a verified visit.
+            </p>
+
+            <div className="mt-6 grid gap-8 lg:grid-cols-[300px_1fr]">
+              <div className="lg:sticky lg:top-6 lg:self-start">
+                <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+                  <RatingSummary reputation={reputation} />
+                  <div className="mt-5">
+                    <RatingDistribution reputation={reputation} />
+                  </div>
+                  <div className="mt-5 border-t border-[var(--border-subtle)] pt-4">
+                    <DimensionAverages reputation={reputation} />
+                  </div>
+                </div>
+              </div>
+
+              <ul className="space-y-4">
+                {reviews.slice(0, 20).map((r) => (
+                  <li key={r.id}>
+                    <ReviewCard review={r} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
       </main>
     </>
   );

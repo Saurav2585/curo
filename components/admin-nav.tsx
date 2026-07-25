@@ -1,10 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Stethoscope, Users, CalendarDays, CreditCard,
-  Receipt, Tag, Megaphone, LifeBuoy, Settings, ShieldCheck,
+  LayoutDashboard, Stethoscope, Users, CalendarDays, CalendarRange, CreditCard,
+  Receipt, Tag, Megaphone, LifeBuoy, Settings, ShieldCheck, ScrollText,
 } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 
@@ -13,27 +14,32 @@ const LINKS = [
   { href: "/admin/providers", label: "Providers", icon: Stethoscope },
   { href: "/admin/patients", label: "Patients", icon: Users },
   { href: "/admin/appointments", label: "Appointments", icon: CalendarDays },
+  { href: "/admin/availability", label: "Availability", icon: CalendarRange },
   { href: "/admin/subscriptions", label: "Subscriptions", icon: CreditCard },
   { href: "/admin/billing", label: "Billing", icon: Receipt },
   { href: "/admin/promotions", label: "Promotions", icon: Tag },
   { href: "/admin/sponsored", label: "Sponsored Listings", icon: Megaphone },
+  { href: "/admin/audit", label: "Audit Log", icon: ScrollText },
   { href: "/admin/support", label: "Support", icon: LifeBuoy },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
-export function AdminNav() {
+export function AdminNav({ bell }: { bell?: ReactNode }) {
   const pathname = usePathname();
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
-      <Link href="/admin" className="mb-6 flex items-center gap-2 px-2">
-        <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]" style={{ background: "var(--bg-inverse)" }}>
-          <ShieldCheck size={18} color="var(--text-onInverse)" aria-hidden />
-        </span>
-        <span className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Curo</span>
-        <span className="rounded-[var(--radius-full)] bg-[var(--bg-sunken)] px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-          Admin
-        </span>
-      </Link>
+      <div className="mb-6 flex items-center justify-between px-2">
+        <Link href="/admin" className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]" style={{ background: "var(--bg-inverse)" }}>
+            <ShieldCheck size={18} color="var(--text-onInverse)" aria-hidden />
+          </span>
+          <span className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Curo</span>
+          <span className="rounded-[var(--radius-full)] bg-[var(--bg-sunken)] px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+            Admin
+          </span>
+        </Link>
+        {bell}
+      </div>
 
       <nav className="flex flex-1 flex-col gap-1">
         {LINKS.map(({ href, label, icon: Icon, exact }) => {

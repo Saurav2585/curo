@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CalendarCheck } from "lucide-react";
 import { getSessionRole } from "@/lib/roles";
 import { signOut } from "@/app/(auth)/actions";
+import { NotificationBell } from "@/components/notification-bell";
 
 export async function SiteHeader() {
   const session = await getSessionRole();
@@ -45,13 +46,22 @@ export async function SiteHeader() {
                 {isDoctor ? "Dashboard" : "My bookings"}
               </Link>
               {!isDoctor && (
-                <Link
-                  href="/account/membership"
-                  className="hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:block"
-                >
-                  Membership
-                </Link>
+                <>
+                  <Link
+                    href="/account/membership"
+                    className="hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:block"
+                  >
+                    Membership
+                  </Link>
+                  <Link
+                    href="/account/activity"
+                    className="hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:block"
+                  >
+                    Activity
+                  </Link>
+                </>
               )}
+              <NotificationBell />
               <form action={signOut}>
                 <button
                   type="submit"

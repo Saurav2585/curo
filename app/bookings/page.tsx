@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarX2, ChevronRight, Sparkles } from "lucide-react";
+import { CalendarX2, ChevronRight, Sparkles, Star } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { cancelBooking } from "./actions";
@@ -49,7 +49,12 @@ function relativeDayLabel(iso: string): string {
   return `${Math.abs(diff)} days ago`;
 }
 
-export default async function BookingsPage() {
+export default async function BookingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ review?: string }>;
+}) {
+  const { review } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -68,6 +73,15 @@ export default async function BookingsPage() {
     .eq("patient_id", user.id)
     .order("starts_at", { ascending: false });
 
+  // Which of these appointments already have a review — so completed visits
+  // show "Write a review" only once. Eligibility itself is enforced centrally
+  // in the DB; this is only for the CTA.
+  const { data: reviewed } = await supabase
+    .from("reviews")
+    .select("appointment_id")
+    .eq("patient_id", user.id);
+  const reviewedIds = new Set((reviewed ?? []).map((r) => r.appointment_id));
+
   const now = Date.now();
   const bookings = rows ?? [];
   const upcoming = bookings.filter(
@@ -78,6 +92,8 @@ export default async function BookingsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Row = ({ b, cancellable }: { b: any; cancellable: boolean }) => {
     const isCancelled = b.status === "cancelled";
+    const canReview = b.status === "completed" && !reviewedIds.has(b.id);
+    const hasReview = b.status === "completed" && reviewedIds.has(b.id);
     return (
       <li
         className="rounded-[var(--radius-xl)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)] transition-shadow duration-200 hover:border-[var(--border-default)] hover:shadow-[var(--shadow-md)]"
@@ -126,9 +142,25 @@ export default async function BookingsPage() {
         </div>
 
         {/* Quiet meta footer gives the card body and uses vertical space */}
-        <div className="mt-4 flex items-center gap-2 border-t border-[var(--border-subtle)] pt-3 text-[0.75rem] text-[var(--text-disabled)]">
-          <span>Booking reference</span>
-          <span className="tabular font-medium text-[var(--text-muted)]">{b.reference}</span>
+        <div className="mt-4 flex items-center justify-between gap-2 border-t border-[var(--border-subtle)] pt-3 text-[0.75rem] text-[var(--text-disabled)]">
+          <span className="flex items-center gap-2">
+            <span>Booking reference</span>
+            <span className="tabular font-medium text-[var(--text-muted)]">{b.reference}</span>
+          </span>
+          {canReview && (
+            <Link
+              href={`/bookings/${b.id}/review`}
+              className="inline-flex items-center gap-1.5 rounded-[var(--radius-md)] px-3 py-1.5 text-[0.8125rem] font-medium"
+              style={{ background: "var(--bg-brand)", color: "var(--text-onBrand)" }}
+            >
+              <Star size={14} aria-hidden /> Write a review
+            </Link>
+          )}
+          {hasReview && (
+            <span className="inline-flex items-center gap-1.5 text-[0.8125rem] text-[var(--text-muted)]">
+              <Star size={14} color="var(--color-amber-500)" fill="var(--color-amber-500)" aria-hidden /> Reviewed
+            </span>
+          )}
         </div>
       </li>
     );
@@ -140,6 +172,19 @@ export default async function BookingsPage() {
 
       <main className="mx-auto max-w-3xl px-6 py-14">
         <h1 className="t-h1">My bookings</h1>
+
+        {review === "thanks" && (
+          <p className="mt-4 rounded-[var(--radius-md)] bg-[var(--bg-successSubtle)] px-4 py-3 text-[0.875rem] text-[var(--text-success)]">
+            Thanks — your review has been published. It now helps other patients choose.
+          </p>
+        )}
+        {(review === "exists" || review === "ineligible") && (
+          <p className="mt-4 rounded-[var(--radius-md)] bg-[var(--bg-sunken)] px-4 py-3 text-[0.875rem] text-[var(--text-muted)]">
+            {review === "exists"
+              ? "You've already reviewed that visit."
+              : "Reviews can only be left for completed appointments you attended."}
+          </p>
+        )}
 
         {/* Free-plan membership card — shown only when an upgrade exists (never on the highest tier) */}
         {membership?.showUpgrade && (

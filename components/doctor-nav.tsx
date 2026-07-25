@@ -1,31 +1,38 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Clock, CalendarCheck, CreditCard, TrendingUp } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Clock, CalendarCheck, CreditCard, TrendingUp, Star, CalendarRange, Activity } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
 
 const LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/appointments", label: "Appointments", icon: CalendarDays },
   { href: "/dashboard/schedule", label: "Schedule", icon: Clock },
+  { href: "/dashboard/availability", label: "Availability", icon: CalendarRange },
+  { href: "/dashboard/reputation", label: "Reputation", icon: Star },
   { href: "/dashboard/visibility", label: "Visibility", icon: TrendingUp },
+  { href: "/dashboard/activity", label: "Activity", icon: Activity },
   { href: "/dashboard/billing", label: "Billing & Plan", icon: CreditCard },
 ];
 
-export function DoctorNav({ doctorName }: { doctorName: string }) {
+export function DoctorNav({ doctorName, bell }: { doctorName: string; bell?: ReactNode }) {
   const pathname = usePathname();
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
-      <Link href="/dashboard" className="mb-6 flex items-center gap-2 px-2">
-        <span
-          className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]"
-          style={{ background: "var(--bg-brand)" }}
-        >
-          <CalendarCheck size={18} color="var(--text-onBrand)" aria-hidden />
-        </span>
-        <span className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Curo</span>
-      </Link>
+      <div className="mb-6 flex items-center justify-between px-2">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <span
+            className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]"
+            style={{ background: "var(--bg-brand)" }}
+          >
+            <CalendarCheck size={18} color="var(--text-onBrand)" aria-hidden />
+          </span>
+          <span className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Curo</span>
+        </Link>
+        {bell}
+      </div>
 
       <p className="px-2 text-[0.75rem] uppercase tracking-wide text-[var(--text-muted)]">
         Doctor portal

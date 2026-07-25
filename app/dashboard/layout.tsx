@@ -5,6 +5,7 @@ import { Stethoscope } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getMyDoctor } from "@/lib/doctor";
 import { DoctorNav } from "@/components/doctor-nav";
+import { NotificationBell } from "@/components/notification-bell";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +76,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen">
-      <DoctorNav doctorName={doctor.full_name} />
+      <DoctorNav doctorName={doctor.full_name} bell={<NotificationBell />} />
       <div className="flex-1 bg-[var(--bg-canvas)]">{children}</div>
     </div>
   );
