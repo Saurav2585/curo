@@ -40,12 +40,44 @@ export function AuthForm({
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [agreed, setAgreed] = useState(false);
+  // Sign-in "Continue as" toggle — tailors the sign-up / apply call-to-action.
+  // Authentication itself is unified: the real role is resolved from the account
+  // and the redirect goes to the right home regardless of this choice.
+  const [loginRole, setLoginRole] = useState<"patient" | "doctor">("patient");
 
   const mismatch = isSignUp && confirm.length > 0 && confirm !== password;
   const canSubmit = !isSignUp || (agreed && password.length >= 6 && confirm === password);
 
   return (
     <div className="space-y-5">
+      {!isSignUp && (
+        <div>
+          <p className="mb-2 text-[0.75rem] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+            Continue as
+          </p>
+          <div className="grid grid-cols-2 gap-1 rounded-[var(--radius-lg)] bg-[var(--bg-sunken)] p-1">
+            {(["patient", "doctor"] as const).map((r) => {
+              const on = loginRole === r;
+              return (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setLoginRole(r)}
+                  aria-pressed={on}
+                  className={
+                    on
+                      ? "rounded-[var(--radius-md)] bg-[var(--bg-surface)] py-2 text-[0.9375rem] font-medium text-[var(--text-primary)] shadow-[var(--shadow-sm)]"
+                      : "rounded-[var(--radius-md)] py-2 text-[0.9375rem] font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                  }
+                >
+                  {r === "patient" ? "Patient" : "Doctor"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <SocialAuth next={next} />
 
       <form action={formAction} className="space-y-4" noValidate>
@@ -147,15 +179,34 @@ export function AuthForm({
 
         <SubmitButton label={isSignUp ? "Create account" : "Sign in"} disabled={!canSubmit} />
 
-        <p className="text-center text-[0.875rem] text-[var(--text-muted)]">
-          {isSignUp ? "Already have an account? " : "New to Curo? "}
-          <Link
-            href={`/${isSignUp ? "sign-in" : "sign-up"}${next ? `?next=${encodeURIComponent(next)}` : ""}`}
-            className="font-medium text-[var(--text-brand)] hover:underline"
-          >
-            {isSignUp ? "Sign in" : "Create an account"}
-          </Link>
-        </p>
+        {isSignUp ? (
+          <p className="text-center text-[0.875rem] text-[var(--text-muted)]">
+            Already have an account?{" "}
+            <Link
+              href={`/sign-in${next ? `?next=${encodeURIComponent(next)}` : ""}`}
+              className="font-medium text-[var(--text-brand)] hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
+        ) : loginRole === "doctor" ? (
+          <p className="text-center text-[0.875rem] text-[var(--text-muted)]">
+            New provider?{" "}
+            <Link href="/apply" className="font-medium text-[var(--text-brand)] hover:underline">
+              Apply to join Curo
+            </Link>
+          </p>
+        ) : (
+          <p className="text-center text-[0.875rem] text-[var(--text-muted)]">
+            New to Curo?{" "}
+            <Link
+              href={`/sign-up${next ? `?next=${encodeURIComponent(next)}` : ""}`}
+              className="font-medium text-[var(--text-brand)] hover:underline"
+            >
+              Create an account
+            </Link>
+          </p>
+        )}
       </form>
     </div>
   );

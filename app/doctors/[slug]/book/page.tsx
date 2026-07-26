@@ -47,10 +47,21 @@ export default async function BookPage({
   const slots = (data ?? []) as Slot[];
   const bookable = slots.filter((s) => s.status === "available");
 
-  // For the empty states: where should we send them instead?
-  const upcoming = slots.length === 0 || bookable.length === 0
-    ? (await getNextSlots([doctor.id], 3))[doctor.id] ?? []
-    : [];
+  // For the empty states: where should we send them instead? These chips jump
+  // to the next available DAY, so collapse slots to one per distinct day (a
+  // wider window feeds the dedupe) and show up to three different days.
+  const upcoming: string[] = [];
+  if (slots.length === 0 || bookable.length === 0) {
+    const nextSlots = (await getNextSlots([doctor.id], 20))[doctor.id] ?? [];
+    const seenDays = new Set<string>();
+    for (const s of nextSlots) {
+      const day = s.slice(0, 10);
+      if (seenDays.has(day)) continue;
+      seenDays.add(day);
+      upcoming.push(s);
+      if (upcoming.length >= 3) break;
+    }
+  }
 
   return (
     <>
