@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getPatientMembership, providerCanReceiveBookings } from "@/lib/subscription";
+import { can } from "@/lib/entitlements";
 
 export type BookingState =
   | { status: "error"; message: string }
@@ -45,6 +47,33 @@ export async function confirmBooking(
         `/doctors/${doctorSlug}/book/confirm?slot=${slotStart}`
       )}`
     );
+  }
+
+  // --- Server-side subscription enforcement (client checks are UX only) ---
+  // Existing bookings/history are untouched; only this NEW booking is gated.
+
+  // 1) The provider must be able to receive new bookings (expired trials cannot).
+  if (!(await providerCanReceiveBookings(doctorId))) {
+    return {
+      status: "error",
+      message:
+        "This provider isn’t accepting new bookings right now. Please choose another doctor.",
+    };
+  }
+
+  // 2) Free patients are capped at their complimentary appointments (including
+  //    any active promotion); Care+ is unlimited. The permission comes from the
+  //    entitlement engine, never a hardcoded plan check.
+  const membership = await getPatientMembership();
+  if (
+    membership &&
+    !can(membership.plan, "unlimited_appointments") &&
+    membership.used >= membership.quota
+  ) {
+    return {
+      status: "error",
+      message: `You’ve used all ${membership.quota} complimentary appointments this month. Upgrade to Care+ for unlimited bookings — your existing appointments stay available.`,
+    };
   }
 
   const { data, error } = await supabase

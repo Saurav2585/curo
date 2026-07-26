@@ -206,7 +206,7 @@ export default async function BookingsPage({
                 </p>
                 <p className="text-[0.8125rem] text-[var(--text-muted)]">
                   {membership.overLimit
-                    ? "Keep booking as normal — upgrade to Care+ for unlimited appointments."
+                    ? "New bookings are paused until you upgrade to Care+. Your existing appointments remain available."
                     : "Upgrade to Care+ for unlimited appointments, SMS reminders and lab discounts."}
                 </p>
               </div>

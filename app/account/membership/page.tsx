@@ -82,9 +82,10 @@ export default async function MembershipPage() {
                 >
                   <ArrowUpCircle size={16} color="var(--text-brand)" className="mt-0.5 shrink-0" aria-hidden />
                   <span className="text-[var(--text-secondary)]">
-                    You&apos;ve used your 3 complimentary appointments this month. You can still book as
-                    normal — upgrade to <strong className="text-[var(--text-primary)]">Care+</strong> for
-                    unlimited appointments, faster booking and lab discounts.
+                    You&apos;ve used all your complimentary appointments this month, so new bookings are
+                    paused. Upgrade to <strong className="text-[var(--text-primary)]">Care+</strong> for
+                    unlimited appointments, faster booking and lab discounts — your existing appointments
+                    stay available.
                   </span>
                 </div>
               )}

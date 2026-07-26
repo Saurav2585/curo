@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getMyDoctor } from "@/lib/doctor";
+import { providerCanReceiveBookings } from "@/lib/subscription";
 import { SCHEDULE_EVENT_KINDS, type ScheduleEventKind } from "@/lib/schedule";
 
 // India has no DST, so the clinic zone is a fixed +05:30 offset. Building the
@@ -19,6 +20,13 @@ const toClinicISO = (date: string, time: string) => `${date}T${time}:00${CLINIC_
 export async function addScheduleEvent(formData: FormData) {
   const doctor = await getMyDoctor();
   if (!doctor) redirect("/dashboard");
+
+  // Enforcement: an expired trial cannot publish NEW availability. Existing
+  // schedule stays visible; only new authoring is blocked. Renewal is prompted
+  // via the existing billing surfaces.
+  if (!(await providerCanReceiveBookings(doctor.id))) {
+    redirect("/dashboard/availability?error=expired");
+  }
 
   const kind = String(formData.get("kind") ?? "") as ScheduleEventKind;
   if (!SCHEDULE_EVENT_KINDS.includes(kind)) {

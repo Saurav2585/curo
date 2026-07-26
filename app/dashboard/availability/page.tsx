@@ -116,7 +116,11 @@ export default async function AvailabilityPage({
       )}
       {error && (
         <p className="mt-4 max-w-3xl rounded-[var(--radius-md)] bg-[var(--bg-dangerSubtle)] px-4 py-2.5 text-[0.875rem] text-[var(--text-danger)]">
-          {error === "range" ? "End must be after start." : "Couldn't save that event — please check the fields."}
+          {error === "range"
+            ? "End must be after start."
+            : error === "expired"
+              ? "Your trial has ended — renew your plan to update your schedule. Your existing schedule stays visible."
+              : "Couldn't save that event — please check the fields."}
         </p>
       )}
 

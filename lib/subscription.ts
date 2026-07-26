@@ -8,6 +8,7 @@ import {
   type ProviderPlanId,
 } from "@/lib/entitlements";
 import { deriveLifecycle, type SubscriptionDates, type Lifecycle } from "@/lib/lifecycle";
+import { getActivePromotion } from "@/lib/promotions";
 
 type SubRow = {
   plan: string;
@@ -69,15 +70,31 @@ export async function getPatientMembership() {
   // An expired paid membership falls back to Free (display only).
   const effectivePlan: PatientPlanId = lifecycle.state === "expired" ? "free" : plan;
 
+  // The complimentary quota respects an active "extra_appointments" promotion,
+  // resolved through the promotion engine — no duplicated promo logic. The
+  // single quota computed here is what booking enforcement reads too.
+  let quota = FREE_APPOINTMENT_QUOTA;
+  if (effectivePlan === "free") {
+    const promo = await getActivePromotion({
+      placement: "membership",
+      audience: "patient",
+      role: "patient",
+      plan: effectivePlan,
+    });
+    if (promo && promo.coupon_type === "extra_appointments") {
+      quota += Math.max(0, Math.floor(promo.value));
+    }
+  }
+
   return {
     plan: effectivePlan,
     isFree: effectivePlan === "free",
     isHighestTier: isHighestPlan(effectivePlan),
     showUpgrade: !isHighestPlan(effectivePlan),
     used,
-    quota: FREE_APPOINTMENT_QUOTA,
-    remaining: Math.max(0, FREE_APPOINTMENT_QUOTA - used),
-    overLimit: effectivePlan === "free" && used >= FREE_APPOINTMENT_QUOTA,
+    quota,
+    remaining: Math.max(0, quota - used),
+    overLimit: effectivePlan === "free" && used >= quota,
     lifecycle,
   };
 }
@@ -123,4 +140,23 @@ export async function getProviderSubscription(doctorId: string, userId: string) 
     // Enterprise + Clinic Pro (top self-serve) never see upgrade prompts.
     showUpgrade: !isHighestPlan(plan) && plan !== "clinic",
   };
+}
+
+/**
+ * Whether a provider may receive NEW bookings / publish NEW availability.
+ * Reuses the lifecycle engine via getProviderSubscription: ONLY an expired trial
+ * blocks new actions. Active trials and every paid plan (Professional, Clinic
+ * Pro, Enterprise) can operate fully. Historical data is never affected — this
+ * gates new actions only. Seeded/unlinked demo doctors are not enforced.
+ */
+export async function providerCanReceiveBookings(doctorId: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { data: doc } = await supabase
+    .from("doctors")
+    .select("profile_id")
+    .eq("id", doctorId)
+    .maybeSingle();
+  if (!doc?.profile_id) return true;
+  const sub = await getProviderSubscription(doctorId, doc.profile_id);
+  return !sub.trialExpired;
 }
