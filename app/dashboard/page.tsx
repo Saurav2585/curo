@@ -2,12 +2,20 @@ import { Fragment } from "react";
 import type { ComponentType } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CalendarClock, Users, Activity, XCircle, Clock } from "lucide-react";
+import { CalendarClock, Users, Activity, XCircle, Clock, BarChart3, Star } from "lucide-react";
 import { getMyDoctor, clinicTzToday } from "@/lib/doctor";
 import { createClient } from "@/lib/supabase/server";
 import { getProviderSubscription } from "@/lib/subscription";
+import { getReputation } from "@/lib/reviews";
+import { RatingSummary, RatingDistribution } from "@/components/reviews";
 import { PromotionSlot } from "@/components/promotion-slot";
 import { slotTime } from "@/lib/format";
+
+const WEEK_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+function clinicWeekdayIdx(d: Date): number {
+  const wd = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kolkata", weekday: "short" }).format(d);
+  return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(wd);
+}
 
 export const dynamic = "force-dynamic";
 
@@ -120,6 +128,20 @@ export default async function DashboardPage() {
     month: "short",
   }).format(new Date());
 
+  // Weekly appointment volume (real data) + reputation, for the analytics row.
+  const weekStart = new Date(Date.now() - 6 * 86_400_000).toISOString();
+  const [{ data: weekRows }, reputation] = await Promise.all([
+    supabase.from("appointments").select("starts_at").eq("doctor_id", doctor.id).gte("starts_at", weekStart),
+    getReputation(doctor.id),
+  ]);
+  const weekBuckets = [0, 0, 0, 0, 0, 0, 0];
+  for (const r of weekRows ?? []) {
+    const i = clinicWeekdayIdx(new Date(r.starts_at));
+    if (i >= 0) weekBuckets[i]++;
+  }
+  const weekMax = Math.max(1, ...weekBuckets);
+  const todayIdx = clinicWeekdayIdx(new Date());
+
   return (
     <main className="p-8">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
@@ -214,6 +236,77 @@ export default async function DashboardPage() {
           tone="neutral"
         />
       </div>
+
+      {/* Analytics row — appointment volume + reputation */}
+      <section className="mt-8 grid gap-5 lg:grid-cols-3">
+        <div className="card p-6 lg:col-span-2">
+          <div className="mb-6 flex items-baseline justify-between">
+            <h2 className="flex items-center gap-2 text-[1.125rem] font-semibold text-[var(--text-primary)]">
+              <BarChart3 size={17} color="var(--text-brand)" aria-hidden /> Appointment overview
+            </h2>
+            <span className="text-[0.8125rem] text-[var(--text-muted)]">Last 7 days</span>
+          </div>
+          <div className="grid grid-cols-7 gap-3 border-b border-[var(--border-subtle)]" style={{ height: 200 }}>
+            {weekBuckets.map((c, i) => (
+              <div key={i} className="flex h-full flex-col items-center justify-end gap-1.5">
+                <span className="tabular text-[0.6875rem] font-medium text-[var(--text-secondary)]">{c || ""}</span>
+                <div
+                  className="w-full rounded-t-[var(--radius-sm)] transition-[height] duration-500"
+                  style={{
+                    height: `${Math.max((c / weekMax) * 100, c > 0 ? 6 : 1.5)}%`,
+                    background:
+                      i === todayIdx
+                        ? "var(--bg-brand)"
+                        : "color-mix(in srgb, var(--bg-brand) 18%, transparent)",
+                  }}
+                  title={`${c} appointment${c === 1 ? "" : "s"}`}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="mt-2.5 grid grid-cols-7 gap-3">
+            {WEEK_LABELS.map((l, i) => (
+              <span
+                key={l}
+                className={`text-center text-[0.75rem] font-medium ${
+                  i === todayIdx ? "text-[var(--text-brand)]" : "text-[var(--text-muted)]"
+                }`}
+              >
+                {l}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="card p-6">
+          <div className="mb-4 flex items-baseline justify-between">
+            <h2 className="flex items-center gap-2 text-[1.125rem] font-semibold text-[var(--text-primary)]">
+              <Star size={16} color="var(--color-amber-500)" fill="var(--color-amber-500)" aria-hidden /> Reputation
+            </h2>
+            <Link href="/dashboard/reputation" className="text-[0.8125rem] font-medium text-[var(--text-brand)] hover:underline">
+              View all
+            </Link>
+          </div>
+          {reputation.count > 0 ? (
+            <>
+              <RatingSummary reputation={reputation} />
+              <div className="mt-5">
+                <RatingDistribution reputation={reputation} />
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full" style={{ background: "var(--bg-sunken)" }}>
+                <Star size={20} color="var(--text-muted)" aria-hidden />
+              </span>
+              <p className="mt-3 text-[0.9375rem] font-medium text-[var(--text-primary)]">No reviews yet</p>
+              <p className="mt-1 text-[0.8125rem] text-[var(--text-muted)]">
+                Patient feedback appears here after completed visits.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Today's schedule */}
       <section className="mt-8">
