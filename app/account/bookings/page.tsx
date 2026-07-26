@@ -164,12 +164,12 @@ export default async function AccountBookingsPage({
       <h1 className="t-h1">My bookings</h1>
 
       {review === "thanks" && (
-        <p className="mt-4 max-w-3xl rounded-[var(--radius-md)] bg-[var(--bg-successSubtle)] px-4 py-3 text-[0.875rem] text-[var(--text-success)]">
+        <p className="mt-4 w-full rounded-[var(--radius-md)] bg-[var(--bg-successSubtle)] px-4 py-3 text-[0.875rem] text-[var(--text-success)]">
           Thanks — your review has been published. It now helps other patients choose.
         </p>
       )}
       {(review === "exists" || review === "ineligible") && (
-        <p className="mt-4 max-w-3xl rounded-[var(--radius-md)] bg-[var(--bg-sunken)] px-4 py-3 text-[0.875rem] text-[var(--text-muted)]">
+        <p className="mt-4 w-full rounded-[var(--radius-md)] bg-[var(--bg-sunken)] px-4 py-3 text-[0.875rem] text-[var(--text-muted)]">
           {review === "exists"
             ? "You've already reviewed that visit."
             : "Reviews can only be left for completed appointments you attended."}
@@ -177,7 +177,7 @@ export default async function AccountBookingsPage({
       )}
 
       {membership?.showUpgrade && (
-        <div className="mt-6 flex max-w-3xl flex-col items-start justify-between gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-brandSubtle)] p-4 sm:flex-row sm:items-center">
+        <div className="mt-6 flex w-full flex-col items-start justify-between gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-brandSubtle)] p-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--bg-surface)]">
               <Sparkles size={18} color="var(--text-brand)" aria-hidden />
@@ -211,7 +211,7 @@ export default async function AccountBookingsPage({
       )}
 
       {bookings.length === 0 ? (
-        <div className="mt-8 max-w-3xl rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-12 text-center">
+        <div className="mt-8 w-full rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-12 text-center">
           <span
             className="mx-auto flex h-14 w-14 items-center justify-center rounded-full"
             style={{ background: "var(--bg-brandSubtle)" }}
@@ -233,7 +233,7 @@ export default async function AccountBookingsPage({
           </Link>
         </div>
       ) : (
-        <div className="mt-10 max-w-3xl space-y-12">
+        <div className="mt-10 w-full space-y-12">
           {upcoming.length > 0 && (
             <section>
               <h2 className="mb-4 flex items-center gap-2 text-[0.8125rem] font-semibold uppercase tracking-[0.06em] text-[var(--text-muted)]">
