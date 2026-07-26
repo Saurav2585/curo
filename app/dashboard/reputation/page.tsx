@@ -34,14 +34,14 @@ export default async function ReputationPage() {
         What patients say after completed visits. Separate from profile completeness — this reflects real feedback.
       </p>
 
-      <div className="mt-6 grid max-w-4xl gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid w-full gap-4 sm:grid-cols-3">
         <Stat label="Overall rating" value={reputation.count ? reputation.average.toFixed(1) : "—"} />
         <Stat label="Total reviews" value={reputation.count} />
         <Stat label="Reputation score" value={reputation.count ? `${reputation.reputationScore}/100` : "—"} />
       </div>
 
       {reputation.count === 0 ? (
-        <div className="mt-6 max-w-4xl rounded-[var(--radius-lg)] border border-dashed border-[var(--border-control)] bg-[var(--bg-surface)] p-10 text-center">
+        <div className="mt-6 w-full rounded-[var(--radius-lg)] border border-dashed border-[var(--border-control)] bg-[var(--bg-surface)] p-10 text-center">
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "var(--bg-brandSubtle)" }}>
             <MessageSquare size={22} color="var(--text-brand)" aria-hidden />
           </span>
@@ -51,7 +51,7 @@ export default async function ReputationPage() {
           </p>
         </div>
       ) : (
-        <div className="mt-6 grid max-w-4xl gap-4 lg:grid-cols-2">
+        <div className="mt-6 grid w-full gap-4 lg:grid-cols-2">
           <div className="ring-hairline rounded-[var(--radius-lg)] bg-[var(--bg-surface)] p-5">
             <p className="mb-4 text-[0.8125rem] font-semibold uppercase tracking-[0.06em] text-[var(--text-muted)]">Rating breakdown</p>
             <RatingSummary reputation={reputation} />
@@ -71,7 +71,7 @@ export default async function ReputationPage() {
       )}
 
       {reputation.count > 0 && (
-        <section className="mt-8 max-w-4xl">
+        <section className="mt-8 w-full">
           <h2 className="flex items-center gap-2 text-[1.125rem] font-semibold text-[var(--text-primary)]">
             <Star size={18} color="var(--color-amber-500)" fill="var(--color-amber-500)" aria-hidden />
             Recent reviews

@@ -53,7 +53,7 @@ export default async function BillingPage() {
       <main className="p-8">
         <h1 className="text-[1.75rem] font-bold tracking-tight text-[var(--text-primary)]">Billing &amp; Plan</h1>
 
-        <div className="mt-6 max-w-2xl rounded-[var(--radius-lg)] border p-6" style={{ borderColor: "var(--border-brand)", background: "var(--bg-brandSubtle)" }}>
+        <div className="mt-6 w-full rounded-[var(--radius-lg)] border p-6" style={{ borderColor: "var(--border-brand)", background: "var(--bg-brandSubtle)" }}>
           <p className="text-[0.8125rem] text-[var(--text-muted)]">Current plan</p>
           <p className="mt-0.5 text-[1.5rem] font-bold text-[var(--text-primary)]">Enterprise</p>
           <p className="mt-1 text-[0.9375rem] text-[var(--text-secondary)]">{ENTERPRISE_PLAN.tagline}</p>
@@ -67,7 +67,7 @@ export default async function BillingPage() {
           </ul>
         </div>
 
-        <div className="mt-4 grid max-w-2xl gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid w-full gap-4 sm:grid-cols-2">
           <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
             <p className="flex items-center gap-2 font-medium text-[var(--text-primary)]">
               <Headset size={16} color="var(--text-brand)" aria-hidden /> Account manager
@@ -104,12 +104,12 @@ export default async function BillingPage() {
       <h1 className="text-[1.75rem] font-bold tracking-tight text-[var(--text-primary)]">Billing &amp; Plan</h1>
 
       {/* Promotion slot — provider billing placement */}
-      <div className="mt-6 max-w-5xl">
+      <div className="mt-6 w-full">
         <PromotionSlot placement="billing" plan={sub.plan} />
       </div>
 
       {/* Current plan + state */}
-      <div className="mt-6 max-w-5xl rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">
+      <div className="mt-6 w-full rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[0.8125rem] text-[var(--text-muted)]">Current plan</p>
@@ -166,14 +166,14 @@ export default async function BillingPage() {
         <section className="mt-10">
           <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Compare plans</h2>
           <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">Flat pricing, zero commission on every booking.</p>
-          <div className="mt-4 max-w-5xl">
+          <div className="mt-4 w-full">
             <PlanComparison plans={PROVIDER_PLANS} currentPlanId={sub.onTrial ? undefined : sub.plan} />
           </div>
         </section>
       )}
 
       {/* Invoice history (GST invoices) */}
-      <section className="mt-10 max-w-5xl">
+      <section className="mt-10 w-full">
         <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Invoice history</h2>
         <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">GST invoices for your subscription.</p>
         <div className="mt-4">
@@ -182,7 +182,7 @@ export default async function BillingPage() {
       </section>
 
       {/* Payment method + visibility placeholders */}
-      <section className="mt-8 grid max-w-5xl gap-4 sm:grid-cols-2">
+      <section className="mt-8 grid w-full gap-4 sm:grid-cols-2">
         <PaymentMethodsPlaceholder />
         <Placeholder icon={Sparkles} title="Visibility packs" body="Featured & sponsored placement — coming soon." />
       </section>

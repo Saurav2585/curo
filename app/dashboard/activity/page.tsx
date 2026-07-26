@@ -26,7 +26,7 @@ export default async function ProviderActivityPage() {
         Your practice history — profile, schedule, subscription, and visibility changes. Read-only.
       </p>
 
-      <div className="mt-6 max-w-2xl">
+      <div className="mt-6 w-full">
         <AuditTimeline entries={entries} emptyText="No recent activity yet. Changes to your practice will appear here." />
       </div>
     </main>

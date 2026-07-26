@@ -64,7 +64,7 @@ export default async function VisibilityPage() {
       <h1 className="text-[1.75rem] font-bold tracking-tight text-[var(--text-primary)]">Visibility</h1>
       <p className="text-[0.9375rem] text-[var(--text-muted)]">How you appear in search, and what lifts your ranking.</p>
 
-      <div className="mt-6 grid max-w-4xl gap-4 lg:grid-cols-2">
+      <div className="mt-6 grid w-full gap-4 lg:grid-cols-2">
         {/* Current visibility + completeness */}
         <div className="ring-hairline rounded-[var(--radius-lg)] bg-[var(--bg-surface)] p-5">
           <div className="flex items-center justify-between">
@@ -125,7 +125,7 @@ export default async function VisibilityPage() {
       </div>
 
       {/* Visibility benefits */}
-      <section className="mt-8 max-w-4xl">
+      <section className="mt-8 w-full">
         <h2 className="text-[1.125rem] font-semibold text-[var(--text-primary)]">Visibility levels</h2>
         <div className="mt-3 grid gap-4 sm:grid-cols-3">
           {(["standard", "featured", "sponsored"] as VisibilityLevel[]).map((lv) => {

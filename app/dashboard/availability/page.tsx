@@ -110,12 +110,12 @@ export default async function AvailabilityPage({
       </p>
 
       {ok && (
-        <p className="mt-4 max-w-3xl rounded-[var(--radius-md)] bg-[var(--bg-successSubtle)] px-4 py-2.5 text-[0.875rem] text-[var(--text-success)]">
+        <p className="mt-4 w-full rounded-[var(--radius-md)] bg-[var(--bg-successSubtle)] px-4 py-2.5 text-[0.875rem] text-[var(--text-success)]">
           {ok === "added" ? "Schedule event added." : "Schedule event removed."}
         </p>
       )}
       {error && (
-        <p className="mt-4 max-w-3xl rounded-[var(--radius-md)] bg-[var(--bg-dangerSubtle)] px-4 py-2.5 text-[0.875rem] text-[var(--text-danger)]">
+        <p className="mt-4 w-full rounded-[var(--radius-md)] bg-[var(--bg-dangerSubtle)] px-4 py-2.5 text-[0.875rem] text-[var(--text-danger)]">
           {error === "range"
             ? "End must be after start."
             : error === "expired"
@@ -125,7 +125,7 @@ export default async function AvailabilityPage({
       )}
 
       {/* Profile availability status */}
-      <div className="mt-6 flex max-w-3xl flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6 flex w-full flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[0.8125rem] text-[var(--text-muted)]">Profile availability status</p>
           <div className="mt-2"><AvailabilityBadge status={status} /></div>
@@ -134,7 +134,7 @@ export default async function AvailabilityPage({
       </div>
 
       {/* Weekly schedule */}
-      <section className="mt-8 max-w-3xl">
+      <section className="mt-8 w-full">
         <h2 className="mb-3 flex items-center gap-2 text-[1.0625rem] font-semibold text-[var(--text-primary)]">
           <Clock size={17} color="var(--text-brand)" aria-hidden /> Weekly schedule
         </h2>
@@ -163,14 +163,14 @@ export default async function AvailabilityPage({
         </p>
       </section>
 
-      <div className="mt-8 grid max-w-3xl gap-8">
+      <div className="mt-8 grid w-full gap-8">
         <Section title="Upcoming leave" icon={CalendarOff} events={leave} empty="No upcoming leave." />
         <Section title="Upcoming exceptions" icon={ShieldAlert} events={[...closures, ...overrides]} empty="No holidays, closures, or overrides scheduled." />
         <Section title="Blocked periods" icon={Ban} events={blocks} empty="No blocked periods (e.g. lunch, meetings, surgery)." />
       </div>
 
       {/* Add event */}
-      <section className="mt-10 max-w-3xl">
+      <section className="mt-10 w-full">
         <h2 className="mb-3 flex items-center gap-2 text-[1.0625rem] font-semibold text-[var(--text-primary)]">
           <Plus size={17} color="var(--text-brand)" aria-hidden /> Add a schedule event
         </h2>
