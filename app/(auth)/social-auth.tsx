@@ -35,9 +35,11 @@ function SocialButton({
   next?: string;
 }) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function onClick() {
     setLoading(true);
+    setError(null);
     const supabase = createClient();
     const redirectTo = `${window.location.origin}/auth/callback${
       next ? `?next=${encodeURIComponent(next)}` : ""
@@ -46,30 +48,38 @@ function SocialButton({
       provider,
       options: { redirectTo },
     });
-    // If the provider isn't enabled in Supabase yet, surface it rather than hang.
-    // On success the browser is already navigating away.
+    // If the provider isn't enabled in Supabase yet, fail gracefully with an
+    // inline message rather than a jarring dialog or a hang. On success the
+    // browser is already navigating away. This is the Facebook graceful path.
     if (error) {
       setLoading(false);
-      alert(`${label} isn't available yet. (${error.message})`);
+      setError(`${label} isn't available right now. Please use email${provider === "facebook" ? " or Google" : ""} to continue.`);
     }
   }
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={loading}
-      className="flex h-11 w-full items-center justify-center gap-2.5 rounded-[var(--radius-md)] border border-[var(--border-control)] bg-[var(--bg-surface)] text-[0.9375rem] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-sunken)] disabled:opacity-60"
-    >
-      {loading ? (
-        <span className="text-[var(--text-muted)]">Connecting…</span>
-      ) : (
-        <>
-          {icon}
-          {label}
-        </>
+    <div>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={loading}
+        className="flex h-11 w-full items-center justify-center gap-2.5 rounded-[var(--radius-md)] border border-[var(--border-control)] bg-[var(--bg-surface)] text-[0.9375rem] font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-sunken)] disabled:opacity-60"
+      >
+        {loading ? (
+          <span className="text-[var(--text-muted)]">Connecting…</span>
+        ) : (
+          <>
+            {icon}
+            {label}
+          </>
+        )}
+      </button>
+      {error && (
+        <p className="mt-1.5 text-[0.75rem] text-[var(--text-danger)]" role="alert">
+          {error}
+        </p>
       )}
-    </button>
+    </div>
   );
 }
 
