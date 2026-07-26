@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { CalendarX2 } from "lucide-react";
 import { getMyDoctor } from "@/lib/doctor";
 import { createClient } from "@/lib/supabase/server";
 import { slotFull } from "@/lib/format";
@@ -13,19 +14,25 @@ const FILTERS = [
   { key: "all", label: "All" },
 ] as const;
 
+function initials(name?: string): string {
+  const parts = (name ?? "").split(/\s+/).filter(Boolean).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "—";
+}
+
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { bg: string; fg: string; label: string }> = {
     booked: { bg: "var(--bg-brandSubtle)", fg: "var(--text-brand)", label: "Confirmed" },
-    completed: { bg: "var(--bg-sunken)", fg: "var(--text-muted)", label: "Completed" },
+    completed: { bg: "var(--bg-successSubtle)", fg: "var(--text-success)", label: "Completed" },
     cancelled: { bg: "var(--bg-dangerSubtle)", fg: "var(--text-danger)", label: "Cancelled" },
     no_show: { bg: "var(--bg-sunken)", fg: "var(--text-muted)", label: "Missed" },
   };
   const s = map[status] ?? map.completed;
   return (
     <span
-      className="rounded-[var(--radius-full)] px-2.5 py-0.5 text-[0.75rem] font-medium"
+      className="inline-flex items-center gap-1.5 rounded-[var(--radius-full)] px-2.5 py-0.5 text-[0.75rem] font-medium"
       style={{ background: s.bg, color: s.fg }}
     >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.fg }} aria-hidden />
       {s.label}
     </span>
   );
@@ -56,60 +63,87 @@ export default async function AppointmentsPage({
     ascending: filter === "upcoming",
   });
 
+  const count = appts?.length ?? 0;
+  const TH = "sticky top-0 z-10 bg-[var(--bg-sunken)] px-4 py-3 text-left text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-[var(--text-muted)]";
+
   return (
     <main className="p-8">
-      <h1 className="text-[2rem] font-bold tracking-tight text-[var(--text-primary)]">
-        Appointments
-      </h1>
+      <header className="mb-5">
+        <h1 className="text-[1.875rem] font-bold tracking-[-0.02em] text-[var(--text-primary)]">
+          Appointments
+        </h1>
+        <p className="mt-1 text-[0.9375rem] text-[var(--text-muted)]">
+          Your upcoming and past consultations.
+        </p>
+      </header>
 
-      <div className="mt-4 flex gap-2">
-        {FILTERS.map((f) => (
-          <Link
-            key={f.key}
-            href={`/dashboard/appointments?filter=${f.key}`}
-            className="rounded-[var(--radius-full)] border px-3.5 py-1.5 text-[0.8125rem] font-medium"
-            style={
-              filter === f.key
-                ? { background: "var(--bg-brand)", borderColor: "var(--bg-brand)", color: "var(--text-onBrand)" }
-                : { background: "var(--bg-surface)", borderColor: "var(--border-control)", color: "var(--text-secondary)" }
-            }
-          >
-            {f.label}
-          </Link>
-        ))}
+      {/* Segmented filters */}
+      <div className="flex flex-wrap items-center gap-1.5 rounded-[var(--radius-lg)] bg-[var(--bg-sunken)] p-1" style={{ width: "fit-content" }}>
+        {FILTERS.map((f) => {
+          const active = filter === f.key;
+          return (
+            <Link
+              key={f.key}
+              href={`/dashboard/appointments?filter=${f.key}`}
+              aria-current={active ? "page" : undefined}
+              className={
+                active
+                  ? "rounded-[var(--radius-md)] bg-[var(--bg-surface)] px-3.5 py-1.5 text-[0.8125rem] font-semibold text-[var(--text-primary)] shadow-[var(--shadow-sm)]"
+                  : "rounded-[var(--radius-md)] px-3.5 py-1.5 text-[0.8125rem] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
+              }
+            >
+              {f.label}
+            </Link>
+          );
+        })}
       </div>
 
-      <div className="mt-6">
+      <p className="mt-4 text-[0.8125rem] text-[var(--text-muted)]">
+        <span className="tabular font-semibold text-[var(--text-secondary)]">{count}</span>{" "}
+        {count === 1 ? "appointment" : "appointments"}
+      </p>
+
+      <div className="mt-3">
         {appts && appts.length > 0 ? (
-          <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-subtle)]">
+          <div className="card overflow-hidden">
             <table className="w-full text-[0.9375rem]">
               <thead>
-                <tr className="bg-[var(--bg-sunken)] text-left text-[0.8125rem] text-[var(--text-muted)]">
-                  <th className="px-4 py-3 font-medium">When</th>
-                  <th className="px-4 py-3 font-medium">Patient</th>
-                  <th className="px-4 py-3 font-medium">Phone</th>
-                  <th className="px-4 py-3 font-medium">Reason</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium"></th>
+                <tr>
+                  <th className={TH}>When</th>
+                  <th className={TH}>Patient</th>
+                  <th className={TH}>Phone</th>
+                  <th className={TH}>Reason</th>
+                  <th className={TH}>Status</th>
+                  <th className={TH}></th>
                 </tr>
               </thead>
               <tbody>
                 {appts.map((a) => (
-                  <tr key={a.id} className="border-t border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-                    <td className="tabular whitespace-nowrap px-4 py-3 font-medium text-[var(--text-brand)]">
+                  <tr
+                    key={a.id}
+                    className="border-t border-[var(--border-subtle)] transition-colors hover:bg-[var(--bg-sunken)]"
+                  >
+                    <td className="tabular whitespace-nowrap px-4 py-3.5 font-medium text-[var(--text-brand)]">
                       {slotFull(a.starts_at)}
                     </td>
-                    <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
-                      {a.patient_name}
+                    <td className="px-4 py-3.5">
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[0.75rem] font-semibold"
+                          style={{ background: "var(--bg-brandSubtle)", color: "var(--text-brand)" }}
+                          aria-hidden
+                        >
+                          {initials(a.patient_name)}
+                        </span>
+                        <span className="font-medium text-[var(--text-primary)]">{a.patient_name}</span>
+                      </div>
                     </td>
-                    <td className="tabular px-4 py-3 text-[var(--text-muted)]">
-                      {a.patient_phone || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-[var(--text-muted)]">{a.reason || "—"}</td>
-                    <td className="px-4 py-3">
+                    <td className="tabular px-4 py-3.5 text-[var(--text-muted)]">{a.patient_phone || "—"}</td>
+                    <td className="px-4 py-3.5 text-[var(--text-muted)]">{a.reason || "—"}</td>
+                    <td className="px-4 py-3.5">
                       <StatusBadge status={a.status} />
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3.5 text-right">
                       <Link
                         href={`/dashboard/appointments/${a.id}`}
                         className="text-[0.8125rem] font-medium text-[var(--text-brand)] hover:underline"
@@ -123,13 +157,14 @@ export default async function AppointmentsPage({
             </table>
           </div>
         ) : (
-          <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-10 text-center">
-            <p className="text-[1.125rem] font-medium text-[var(--text-primary)]">
+          <div className="card flex flex-col items-center px-6 py-14 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full" style={{ background: "var(--bg-sunken)" }}>
+              <CalendarX2 size={22} color="var(--text-muted)" aria-hidden />
+            </span>
+            <p className="mt-4 text-[1.0625rem] font-semibold text-[var(--text-primary)]">
               No {filter === "all" ? "" : filter} appointments
             </p>
-            <p className="mt-1 text-[var(--text-muted)]">
-              Nothing to show in this view.
-            </p>
+            <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">Nothing to show in this view.</p>
           </div>
         )}
       </div>

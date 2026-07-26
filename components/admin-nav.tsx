@@ -5,9 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Stethoscope, Users, CalendarDays, CalendarRange, CreditCard,
-  Receipt, Tag, Megaphone, LifeBuoy, Settings, ShieldCheck, ScrollText,
+  Receipt, Tag, Megaphone, LifeBuoy, Settings, ScrollText,
 } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
+import { LogoMark } from "@/components/brand";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -29,10 +30,8 @@ export function AdminNav({ bell }: { bell?: ReactNode }) {
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
       <div className="mb-6 flex items-center justify-between px-2">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]" style={{ background: "var(--bg-inverse)" }}>
-            <ShieldCheck size={18} color="var(--text-onInverse)" aria-hidden />
-          </span>
+        <Link href="/admin" className="flex items-center gap-2" aria-label="Curo admin">
+          <LogoMark className="h-8 w-auto" />
           <span className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Curo</span>
           <span className="rounded-[var(--radius-full)] bg-[var(--bg-sunken)] px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
             Admin

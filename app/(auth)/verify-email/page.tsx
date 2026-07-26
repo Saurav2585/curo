@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { MailCheck } from "lucide-react";
+import { Logo } from "@/components/brand";
 import { VerifyForm } from "./verify-form";
 
 export default async function VerifyEmailPage({
@@ -17,14 +17,8 @@ export default async function VerifyEmailPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-      <Link href="/" className="mb-8 flex items-center justify-center gap-2">
-        <span
-          className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)]"
-          style={{ background: "var(--bg-brand)" }}
-        >
-          <MailCheck size={20} color="var(--text-onBrand)" aria-hidden />
-        </span>
-        <span className="text-[1.5rem] font-semibold text-[var(--text-primary)]">Curo</span>
+      <Link href="/" className="mb-8 flex items-center justify-center" aria-label="Curo home">
+        <Logo className="h-10 w-auto" />
       </Link>
 
       <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">

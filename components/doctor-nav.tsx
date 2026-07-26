@@ -3,8 +3,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarDays, Clock, CalendarCheck, CreditCard, TrendingUp, Star, CalendarRange, Activity } from "lucide-react";
+import { LayoutDashboard, CalendarDays, Clock, CreditCard, TrendingUp, Star, CalendarRange, Activity } from "lucide-react";
 import { signOut } from "@/app/(auth)/actions";
+import { LogoMark } from "@/components/brand";
 
 const LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -22,13 +23,8 @@ export function DoctorNav({ doctorName, bell }: { doctorName: string; bell?: Rea
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4">
       <div className="mb-6 flex items-center justify-between px-2">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]"
-            style={{ background: "var(--bg-brand)" }}
-          >
-            <CalendarCheck size={18} color="var(--text-onBrand)" aria-hidden />
-          </span>
+        <Link href="/dashboard" className="flex items-center gap-2" aria-label="Curo">
+          <LogoMark className="h-8 w-auto" />
           <span className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Curo</span>
         </Link>
         {bell}

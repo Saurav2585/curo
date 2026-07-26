@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Clock, CheckCircle2, XCircle, AlertCircle, Stethoscope } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Logo } from "@/components/brand";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/(auth)/actions";
 
@@ -81,11 +82,8 @@ export default async function ApplyStatusPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-16">
-      <Link href="/" className="mb-8 flex items-center justify-center gap-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)]" style={{ background: "var(--bg-brand)" }}>
-          <Stethoscope size={20} color="var(--text-onBrand)" aria-hidden />
-        </span>
-        <span className="text-[1.5rem] font-semibold text-[var(--text-primary)]">Curo</span>
+      <Link href="/" className="mb-8 flex items-center justify-center" aria-label="Curo home">
+        <Logo className="h-10 w-auto" />
       </Link>
 
       <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 text-center shadow-[var(--shadow-sm)]">

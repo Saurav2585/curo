@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { CalendarCheck } from "lucide-react";
 import { getSessionRole } from "@/lib/roles";
 import { signOut } from "@/app/(auth)/actions";
 import { NotificationBell } from "@/components/notification-bell";
+import { Logo } from "@/components/brand";
 
 export async function SiteHeader() {
   const session = await getSessionRole();
@@ -11,16 +11,8 @@ export async function SiteHeader() {
   return (
     <header className="glass sticky top-0 z-40 border-b border-[var(--border-subtle)]">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]"
-            style={{ background: "var(--bg-brand)" }}
-          >
-            <CalendarCheck size={18} color="var(--text-onBrand)" aria-hidden />
-          </span>
-          <span className="text-[1.25rem] font-semibold tracking-tight text-[var(--text-primary)]">
-            Curo
-          </span>
+        <Link href="/" className="flex items-center" aria-label="Curo home">
+          <Logo className="h-9 w-auto" />
         </Link>
 
         <nav className="flex items-center gap-6 text-[0.9375rem]">

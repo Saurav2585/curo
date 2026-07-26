@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { Download, CalendarCheck } from "lucide-react";
+import { Download } from "lucide-react";
+import { Logo } from "@/components/brand";
 import { createClient } from "@/lib/supabase/server";
 import { getInvoiceWithItems, formatMoney } from "@/lib/billing";
 import { InvoiceStatusBadge } from "@/components/invoice-status";
@@ -37,10 +38,7 @@ export default async function InvoiceDetailPage({
         {/* Header */}
         <div className="flex items-start justify-between gap-4 border-b border-[var(--border-subtle)] p-6">
           <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)]" style={{ background: "var(--bg-brand)" }}>
-              <CalendarCheck size={18} color="var(--text-onBrand)" aria-hidden />
-            </span>
-            <span className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Curo</span>
+            <Logo className="h-8 w-auto" />
           </div>
           <div className="text-right">
             <p className="tabular text-[0.9375rem] font-semibold text-[var(--text-primary)]">{invoice.invoice_number}</p>
