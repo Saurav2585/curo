@@ -104,12 +104,12 @@ export default async function BillingPage() {
       <h1 className="text-[1.75rem] font-bold tracking-tight text-[var(--text-primary)]">Billing &amp; Plan</h1>
 
       {/* Promotion slot — provider billing placement */}
-      <div className="mt-6 max-w-2xl">
+      <div className="mt-6 max-w-5xl">
         <PromotionSlot placement="billing" plan={sub.plan} />
       </div>
 
       {/* Current plan + state */}
-      <div className="mt-6 max-w-2xl rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">
+      <div className="mt-6 max-w-5xl rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow-sm)]">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[0.8125rem] text-[var(--text-muted)]">Current plan</p>
@@ -166,14 +166,14 @@ export default async function BillingPage() {
         <section className="mt-10">
           <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Compare plans</h2>
           <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">Flat pricing, zero commission on every booking.</p>
-          <div className="mt-4 max-w-4xl">
+          <div className="mt-4 max-w-5xl">
             <PlanComparison plans={PROVIDER_PLANS} currentPlanId={sub.onTrial ? undefined : sub.plan} />
           </div>
         </section>
       )}
 
       {/* Invoice history (GST invoices) */}
-      <section className="mt-10 max-w-4xl">
+      <section className="mt-10 max-w-5xl">
         <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">Invoice history</h2>
         <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">GST invoices for your subscription.</p>
         <div className="mt-4">
@@ -182,7 +182,7 @@ export default async function BillingPage() {
       </section>
 
       {/* Payment method + visibility placeholders */}
-      <section className="mt-8 grid max-w-4xl gap-4 sm:grid-cols-2">
+      <section className="mt-8 grid max-w-5xl gap-4 sm:grid-cols-2">
         <PaymentMethodsPlaceholder />
         <Placeholder icon={Sparkles} title="Visibility packs" body="Featured & sponsored placement — coming soon." />
       </section>

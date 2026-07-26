@@ -127,7 +127,12 @@ export async function listAudit(filters: AuditFilters = {}): Promise<AuditLog[]>
   if (filters.actor) q = q.ilike("actor_label", `%${filters.actor}%`);
   if (filters.from) q = q.gte("created_at", filters.from);
   if (filters.to) q = q.lte("created_at", `${filters.to}T23:59:59.999Z`);
-  if (filters.search) q = q.or(`actor_label.ilike.%${filters.search}%,target_label.ilike.%${filters.search}%`);
+  if (filters.search) {
+    // Strip PostgREST filter metacharacters so admin free-text can never alter
+    // the query grammar (defensive; the query is already admin-scoped to audit_logs).
+    const s = filters.search.replace(/[(),*:]/g, " ").trim();
+    if (s) q = q.or(`actor_label.ilike.%${s}%,target_label.ilike.%${s}%`);
+  }
 
   q = q.limit(filters.limit ?? 200);
   const { data } = await q;
