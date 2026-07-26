@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { SiteHeader } from "@/components/site-header";
 import { createClient } from "@/lib/supabase/server";
 import { listUserActivity } from "@/lib/audit";
 import { AuditTimeline } from "@/components/audit-timeline";
@@ -18,19 +17,15 @@ export default async function PatientActivityPage() {
   const entries = await listUserActivity(user.id);
 
   return (
-    <>
-      <SiteHeader />
-      <main className="mx-auto max-w-2xl px-6 py-12">
-        <p className="t-eyebrow">Account</p>
-        <h1 className="t-h1 mt-2">Activity</h1>
-        <p className="mt-1 text-[var(--text-muted)]">
-          Your account history — bookings, reviews, membership, and account changes.
-        </p>
+    <main className="p-8">
+      <h1 className="t-h1">Activity</h1>
+      <p className="mt-1 text-[var(--text-muted)]">
+        Your account history — bookings, reviews, membership, and account changes.
+      </p>
 
-        <div className="mt-8">
-          <AuditTimeline entries={entries} emptyText="No account activity yet. Your bookings and updates will appear here." />
-        </div>
-      </main>
-    </>
+      <div className="mt-8 max-w-3xl">
+        <AuditTimeline entries={entries} emptyText="No account activity yet. Your bookings and updates will appear here." />
+      </div>
+    </main>
   );
 }

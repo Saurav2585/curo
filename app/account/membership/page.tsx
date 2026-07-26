@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Check, Sparkles, ArrowUpCircle } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 import { PlanComparison } from "@/components/plan-comparison";
 import { PlanBadge } from "@/components/plan-badge";
 import { LifecycleNotice } from "@/components/lifecycle-notice";
@@ -18,11 +17,8 @@ export default async function MembershipPage() {
   const current = PATIENT_PLANS.find((p) => p.id === membership.plan) ?? PATIENT_PLANS[0];
 
   return (
-    <>
-      <SiteHeader />
-      <main className="mx-auto max-w-3xl px-6 py-12">
-        <p className="t-eyebrow">Account</p>
-        <h1 className="t-h1 mt-2">Membership</h1>
+    <main className="p-8">
+        <h1 className="t-h1">Membership</h1>
 
         {/* Promotion slot — membership placement */}
         <div className="mt-6">
@@ -129,6 +125,5 @@ export default async function MembershipPage() {
           </Link>
         </div>
       </main>
-    </>
   );
 }

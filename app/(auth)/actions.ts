@@ -16,7 +16,7 @@ function safeNext(next: FormData | string | null): string {
   const raw = typeof next === "string" ? next : null;
   // Only allow internal paths — never an open redirect to another origin.
   if (raw && raw.startsWith("/") && !raw.startsWith("//")) return raw;
-  return "/bookings";
+  return "/account";
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,7 +55,7 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
     .eq("id", data.user!.id)
     .maybeSingle();
   redirect(
-    profile?.role === "admin" ? "/admin" : profile?.role === "doctor" ? "/dashboard" : "/bookings"
+    profile?.role === "admin" ? "/admin" : profile?.role === "doctor" ? "/dashboard" : "/account"
   );
 }
 

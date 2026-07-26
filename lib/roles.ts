@@ -28,5 +28,5 @@ export async function getSessionRole(): Promise<
 export function roleHome(role: "patient" | "doctor" | "admin"): string {
   if (role === "admin") return "/admin";
   if (role === "doctor") return "/dashboard";
-  return "/bookings";
+  return "/account";
 }

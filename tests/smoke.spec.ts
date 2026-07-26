@@ -68,8 +68,9 @@ test("patient can sign up and reach an empty bookings page", async ({ page }, te
   await page.getByRole("checkbox").check();
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/sign-up"), { timeout: 15_000 });
+  // Patient portal overview + bookings + membership + billing + activity.
+  await checkPage(page, "/account", testInfo);
   await checkPage(page, "/bookings", testInfo);
-  // Patient membership + billing + activity pages are reachable and healthy.
   await checkPage(page, "/account/membership", testInfo);
   await checkPage(page, "/account/billing", testInfo);
   await checkPage(page, "/account/activity", testInfo);

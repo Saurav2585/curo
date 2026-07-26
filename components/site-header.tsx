@@ -40,27 +40,11 @@ export async function SiteHeader() {
           {session ? (
             <>
               <Link
-                href={isDoctor ? "/dashboard" : "/bookings"}
+                href={isDoctor ? "/dashboard" : "/account"}
                 className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
               >
-                {isDoctor ? "Dashboard" : "My bookings"}
+                Dashboard
               </Link>
-              {!isDoctor && (
-                <>
-                  <Link
-                    href="/account/membership"
-                    className="hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:block"
-                  >
-                    Membership
-                  </Link>
-                  <Link
-                    href="/account/activity"
-                    className="hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:block"
-                  >
-                    Activity
-                  </Link>
-                </>
-              )}
               <NotificationBell />
               <form action={signOut}>
                 <button
