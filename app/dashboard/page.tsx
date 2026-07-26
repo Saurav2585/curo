@@ -41,34 +41,27 @@ function KpiCard({
       ? { bg: "var(--bg-brandSubtle)", fg: "var(--text-brand)" }
       : { bg: "var(--bg-sunken)", fg: "var(--text-muted)" };
   return (
-    <div
-      className="lift rounded-[var(--radius-lg)] bg-[var(--bg-surface)] p-5"
-      style={{
-        // Primary card carries the focal point: a brand-tinted ring vs. the
-        // hairline neutral ring on the rest. Same size, re-weighted.
-        boxShadow: primary
-          ? "inset 0 0 0 1px var(--border-brand)"
-          : "inset 0 0 0 1px var(--border-subtle)",
-      }}
-    >
-      <div className="flex items-center justify-between">
-        <span className="text-[0.8125rem] text-[var(--text-muted)]">{label}</span>
+    <div className={`${primary ? "card-brand" : "card"} card-hover p-6`}>
+      <div className="flex items-start justify-between">
+        <span className="text-[0.75rem] font-medium uppercase tracking-[0.05em] text-[var(--text-muted)]">
+          {label}
+        </span>
         <span
-          className="flex h-8 w-8 items-center justify-center rounded-full"
+          className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)]"
           style={{ background: tint.bg }}
         >
-          <Icon size={16} color={tint.fg} />
+          <Icon size={17} color={tint.fg} />
         </span>
       </div>
       {/* Failed load shows an em-dash, never 0 — a false zero reads as real data */}
       <p
-        className={`tabular mt-3 font-bold leading-none text-[var(--text-primary)] ${
-          primary ? "text-[2.5rem]" : "text-[1.75rem]"
+        className={`tabular mt-4 font-bold leading-none tracking-[-0.02em] text-[var(--text-primary)] ${
+          primary ? "text-[2.5rem]" : "text-[2rem]"
         }`}
       >
         {failed ? "—" : value}
       </p>
-      {sub && <p className="mt-1.5 text-[0.8125rem] text-[var(--text-muted)]">{sub}</p>}
+      {sub && <p className="mt-2 text-[0.8125rem] text-[var(--text-muted)]">{sub}</p>}
     </div>
   );
 }
@@ -129,13 +122,18 @@ export default async function DashboardPage() {
 
   return (
     <main className="p-8">
-      <header className="mb-6">
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-[var(--text-primary)]">
-          Good {new Date().getHours() < 12 ? "morning" : "afternoon"}, {doctor.full_name.replace(/^Dr\.?\s+/i, "")}
-        </h1>
-        <p className="text-[0.9375rem] text-[var(--text-muted)]">
-          {doctor.specialties?.name} · {doctor.clinics?.name}
-        </p>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[1.875rem] font-bold tracking-[-0.02em] text-[var(--text-primary)]">
+            Good {new Date().getHours() < 12 ? "morning" : "afternoon"}, {doctor.full_name.replace(/^Dr\.?\s+/i, "")}
+          </h1>
+          <p className="mt-1 text-[0.9375rem] text-[var(--text-muted)]">
+            {doctor.specialties?.name} · {doctor.clinics?.name}
+          </p>
+        </div>
+        <span className="ring-hairline tabular rounded-[var(--radius-full)] bg-[var(--bg-surface)] px-3.5 py-1.5 text-[0.8125rem] font-medium text-[var(--text-secondary)]">
+          {todayLabel}
+        </span>
       </header>
 
       {/* Trial status card — quiet by default, emphasised under 7 days. Never a popup. */}
@@ -185,7 +183,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPIs — the "are we busy today?" answer, above the detail */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
         <KpiCard
           label="Booked today"
           value={`${stats?.booked_today ?? 0}`}
@@ -219,11 +217,14 @@ export default async function DashboardPage() {
 
       {/* Today's schedule */}
       <section className="mt-8">
-        <div className="mb-3 flex items-baseline gap-2.5">
-          <h2 className="text-[1.25rem] font-semibold text-[var(--text-primary)]">
+        <div className="card p-6">
+        <div className="mb-5 flex items-baseline justify-between">
+          <h2 className="text-[1.125rem] font-semibold text-[var(--text-primary)]">
             Today&apos;s schedule
           </h2>
-          <span className="tabular text-[0.8125rem] text-[var(--text-muted)]">{todayLabel}</span>
+          <span className="tabular text-[0.8125rem] text-[var(--text-muted)]">
+            {appts?.length ?? 0} {(appts?.length ?? 0) === 1 ? "appointment" : "appointments"}
+          </span>
         </div>
 
         {appts && appts.length > 0 ? (
@@ -291,15 +292,22 @@ export default async function DashboardPage() {
           </table>
         ) : (
           /* Empty state */
-          <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-10 text-center">
-            <p className="text-[1.125rem] font-medium text-[var(--text-primary)]">
+          <div className="flex flex-col items-center px-6 py-12 text-center">
+            <span
+              className="flex h-12 w-12 items-center justify-center rounded-full"
+              style={{ background: "var(--bg-brandSubtle)" }}
+            >
+              <CalendarClock size={22} color="var(--text-brand)" aria-hidden />
+            </span>
+            <p className="mt-4 text-[1.0625rem] font-semibold text-[var(--text-primary)]">
               Nothing booked today
             </p>
-            <p className="mt-1 text-[var(--text-muted)]">
+            <p className="mt-1 text-[0.875rem] text-[var(--text-muted)]">
               {stats?.week_booked ?? 0} appointments across the week.
             </p>
           </div>
         )}
+        </div>
       </section>
     </main>
   );

@@ -220,7 +220,54 @@ body {
 .marquee-mask {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-}`);
+}
+
+/* Canonical premium surface — hairline ring + a faint base shadow so cards read
+   as physical layers, not flat fills. Pair with .card-hover for interactive lift. */
+.card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 0 1px var(--border-subtle), 0 1px 2px rgb(14 18 20 / 0.03);
+}
+.card-brand {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 0 1px var(--border-brand), 0 1px 3px rgb(2 112 126 / 0.07);
+}
+
+/* One consistent, restrained hover for interactive cards — a 2px float and a
+   deeper ambient shadow. Never flashy. */
+.card-hover {
+  transition: box-shadow 0.22s var(--ease-out), transform 0.22s var(--ease-out);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px var(--border-control),
+    0 2px 4px -2px rgb(14 18 20 / 0.06),
+    0 18px 36px -18px rgb(14 18 20 / 0.16);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-hover:hover { transform: none; }
+}
+
+/* Skeleton shimmer for premium loading states. */
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-sunken);
+  border-radius: var(--radius-sm);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--bg-surface) 55%, transparent), transparent);
+  animation: shimmer 1.6s infinite;
+}
+@media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none; } }`);
 
 mkdirSync(resolve(root, "app"), { recursive: true });
 writeFileSync(resolve(root, "app/globals.css"), lines.join("\n") + "\n");
