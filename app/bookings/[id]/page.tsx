@@ -159,7 +159,7 @@ export default async function BookingConfirmationPage({
             </a>
 
             <div className="mt-6 flex items-center justify-between text-[0.875rem]">
-              <Link href="/bookings" className="font-medium text-[var(--text-brand)] hover:underline">
+              <Link href="/account/bookings" className="font-medium text-[var(--text-brand)] hover:underline">
                 All my bookings
               </Link>
               <form action={cancelBooking}>

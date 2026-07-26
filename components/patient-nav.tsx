@@ -8,7 +8,7 @@ import { signOut } from "@/app/(auth)/actions";
 
 const LINKS = [
   { href: "/account", label: "Overview", icon: LayoutDashboard, exact: true },
-  { href: "/bookings", label: "My Bookings", icon: CalendarCheck },
+  { href: "/account/bookings", label: "My Bookings", icon: CalendarCheck },
   { href: "/account/membership", label: "Membership", icon: Sparkles },
   { href: "/account/activity", label: "Activity", icon: Activity },
   { href: "/account/billing", label: "Billing", icon: Receipt },

@@ -97,7 +97,7 @@ export default async function AccountOverviewPage() {
       <section className="mt-8">
         <div className="flex items-center justify-between">
           <h2 className="text-[1.125rem] font-semibold text-[var(--text-primary)]">Upcoming appointments</h2>
-          <Link href="/bookings" className="flex items-center gap-1 text-[0.875rem] font-medium text-[var(--text-brand)] hover:underline">
+          <Link href="/account/bookings" className="flex items-center gap-1 text-[0.875rem] font-medium text-[var(--text-brand)] hover:underline">
             View all <ChevronRight size={15} />
           </Link>
         </div>

@@ -34,7 +34,7 @@ export default async function WriteReviewPage({
     .maybeSingle();
 
   if (!appt || appt.patient_id !== user.id || appt.status !== "completed") {
-    redirect("/bookings?review=ineligible");
+    redirect("/account/bookings?review=ineligible");
   }
 
   const { data: existing } = await supabase
@@ -42,7 +42,7 @@ export default async function WriteReviewPage({
     .select("id")
     .eq("appointment_id", id)
     .maybeSingle();
-  if (existing) redirect("/bookings?review=exists");
+  if (existing) redirect("/account/bookings?review=exists");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const doctor = (appt as any).doctors;
@@ -52,7 +52,7 @@ export default async function WriteReviewPage({
       <SiteHeader />
       <main className="mx-auto max-w-2xl px-6 py-12">
         <Link
-          href="/bookings"
+          href="/account/bookings"
           className="inline-flex items-center gap-1 text-[0.875rem] text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
         >
           <ChevronLeft size={16} /> Back to bookings

@@ -25,6 +25,6 @@ export async function cancelBooking(formData: FormData) {
     .eq("id", id)
     .eq("patient_id", user.id);
 
-  revalidatePath("/bookings");
+  revalidatePath("/account/bookings");
   revalidatePath(`/bookings/${id}`);
 }

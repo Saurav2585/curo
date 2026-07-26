@@ -15,7 +15,7 @@ export async function submitReview(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/sign-in?next=/bookings");
+  if (!user) redirect("/sign-in?next=/account/bookings");
 
   const appointmentId = String(formData.get("appointment_id") ?? "");
 
@@ -26,7 +26,7 @@ export async function submitReview(formData: FormData) {
     .maybeSingle();
 
   if (!appt || appt.patient_id !== user.id || appt.status !== "completed") {
-    redirect("/bookings?review=ineligible");
+    redirect("/account/bookings?review=ineligible");
   }
 
   const num = (name: string) => {
@@ -69,6 +69,6 @@ export async function submitReview(formData: FormData) {
 
   if (error) redirect(`/bookings/${appointmentId}/review?error=save`);
 
-  revalidatePath("/bookings");
-  redirect("/bookings?review=thanks");
+  revalidatePath("/account/bookings");
+  redirect("/account/bookings?review=thanks");
 }
